@@ -6,5 +6,6 @@ bool SearchEngine::KeyPressed(const KeyEvent & arg)
 	{
 		m_search = true;
 	}
+	return false;
 }
 
