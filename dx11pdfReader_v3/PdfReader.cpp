@@ -31,8 +31,15 @@ int PdfReader::height()
 	return m_pix->h;
 }
 
-bool PdfReader::SearchText(int page_num)
+bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 {
+	char searchtxt[MAX_PATH];
+
+	int code = WideCharToMultiByte(CP_UTF8, 0, searchtext.c_str(), -1, searchtxt, MAX_PATH, NULL, NULL);
+	if (code == 0)
+		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
+
+
 	int firstpage, page;
 	firstpage = 0;
 	page = m_page_count - 1;
@@ -68,7 +75,7 @@ bool PdfReader::SearchText(int page_num)
 
 	//do
 	//{
-		hit_count = fz_search_stext_page(m_ctx, page_text, "Power\0", m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
+		hit_count = fz_search_stext_page(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
 	//} 
 	//while (page != firstpage);
 		fz_invert_pixmap_rect(m_ctx, m_pix, fz_round_rect(fz_rect_from_quad(m_hit_bbox[0])));
@@ -78,9 +85,15 @@ bool PdfReader::SearchText(int page_num)
 }
 
 
-bool PdfReader::ReadPdfDocument(std::string filename, int page_num)
+bool PdfReader::ReadPdfDocument(std::wstring filename, int page_num)
 {
-	m_filename = filename.c_str();
+	int code = WideCharToMultiByte(CP_UTF8, 0, filename.c_str(), -1, m_filename, MAX_PATH, NULL, NULL);
+	if (code == 0)
+	{
+		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
+		return EXIT_FAILURE;
+	}
+
 	m_ctx = fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
 	if (!m_ctx)
 	{

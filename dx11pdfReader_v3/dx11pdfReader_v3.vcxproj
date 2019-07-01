@@ -150,8 +150,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Control.cpp" />
+    <ClCompile Include="Dialog.cpp" />
+    <ClCompile Include="FindDialog.cpp" />
     <ClCompile Include="InputMgr.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpenDialog.cpp" />
     <ClCompile Include="PageBuilder.cpp" />
     <ClCompile Include="PdfReader.cpp" />
     <ClCompile Include="Render.cpp" />
@@ -160,12 +163,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Control.h" />
+    <ClInclude Include="Dialog.h" />
+    <ClInclude Include="FindDialog.h" />
     <ClInclude Include="InputCodes.h" />
     <ClInclude Include="InputListener.h" />
     <ClInclude Include="InputMgr.h" />
+    <ClInclude Include="OpenDialog.h" />
     <ClInclude Include="PageBuilder.h" />
     <ClInclude Include="PdfReader.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="SearchEngine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

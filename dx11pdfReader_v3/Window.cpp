@@ -1,5 +1,7 @@
 #include "Window.h"
 #include "InputMgr.h"
+#include "OpenDialog.h"
+#include "FindDialog.h"
 
 Window *Window::m_wndthis = nullptr;
 
@@ -90,27 +92,46 @@ void Window::Close()
 	m_hwnd = nullptr;
 }
 
+bool Window::IsSearch()
+{
+	if (m_find == nullptr)
+		return false;
+	else
+		return m_find->IsSearch();
+}
+
 DescWindow Window::GetWindowSize()
 {
 	return m_desc;
 }
 
-wchar_t * Window::GetFilePath()
+std::wstring Window::GetFilePath()
 {
-	return wfilepath;
+	return m_open->getFileName();
 }
 
 LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
+	LPFINDREPLACE fr;
+
 	if (nMsg == m_uFindReplaceMsg)
 	{
-		int i = 0;
+		fr = (LPFINDREPLACE)lParam;
+		switch (fr->Flags)
+		{
+		case FR_FINDNEXT:
+			m_find->Search(true);
+			return 0;
+		case FR_DIALOGTERM:
+			m_find->Search(false);
+		}
 	}
 
 	switch (nMsg)
 	{
 	case WM_CREATE:
-		if (!winfilename(wfilepath, nelem(wfilepath)))
+		m_open = new OpenDialog(this);;
+		if (!m_open->getOpenFileName())
 			exit(0);
 		return 0;
 	case WM_CLOSE:
@@ -161,7 +182,12 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		updateWindowState();
 		return 0;
 	case WM_MOUSEMOVE: case WM_LBUTTONUP: case WM_LBUTTONDOWN: case WM_MBUTTONUP: case WM_MBUTTONDOWN: case WM_RBUTTONUP: case WM_RBUTTONDOWN: case WM_MOUSEWHEEL: case WM_KEYDOWN: case WM_KEYUP:
-		if (m_inputmgr)
+		if (wParam == KEY_F)
+		{
+			m_find = new FindDialog(this);
+			m_dlghwnd = m_find->GetDlgHWND();
+		}
+		else if (m_inputmgr)
 			m_inputmgr->Run(nMsg, wParam, lParam);
 		return 0;
 	}
@@ -186,23 +212,7 @@ void Window::updateWindowState()
 		m_inputmgr->SetWinRect(ClientRect);
 }
 
-int Window::winfilename(wchar_t *buf, int len)
-{
-	OPENFILENAME ofn;
-	buf[0] = 0;
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = m_hwnd;
-	ofn.lpstrFile = buf;
-	ofn.nMaxFile = len;
-	ofn.lpstrInitialDir = NULL;
-	ofn.lpstrTitle = L"Open PDF file";
-	ofn.lpstrFilter = L"Documents (*.pdf;*.xps;*.cbz;*.epub;*.fb2;*.zip;*.png;*.jpeg;*.tiff)\0*.zip;*.cbz;*.xps;*.epub;*.fb2;*.pdf;*.jpe;*.jpg;*.jpeg;*.jfif;*.tif;*.tiff\0PDF Files (*.pdf)\0*.pdf\0XPS Files (*.xps)\0*.xps\0CBZ Files (*.cbz;*.zip)\0*.zip;*.cbz\0EPUB Files (*.epub)\0*.epub\0FictionBook 2 Files (*.fb2)\0*.fb2\0Image Files (*.png;*.jpeg;*.tiff)\0*.png;*.jpg;*.jpe;*.jpeg;*.jfif;*.tif;*.tiff\0All Files\0*\0\0";
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	return GetOpenFileNameW(&ofn);
-}
-
-void Window::winsearch()
+/*void Window::winsearch()
 {
 	memset(&m_fr, 0, sizeof(FINDREPLACE));
 	m_fr.lStructSize = sizeof(FINDREPLACE);
@@ -212,7 +222,7 @@ void Window::winsearch()
 	m_fr.Flags = 0;
 	m_dlghwnd =	FindTextW(&m_fr);
 
-}
+}*/
 
 LRESULT CALLBACK StaticWndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {

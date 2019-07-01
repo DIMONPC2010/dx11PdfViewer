@@ -14,13 +14,8 @@ Control::~Control()
 
 void Control::SetPages()
 {
-	char filename[PATH_MAX];
-	int code = WideCharToMultiByte(CP_UTF8, 0, m_wnd->GetFilePath(), -1, filename, sizeof(filename), NULL, NULL);
-	if (code == 0)
-		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
-	m_pages = std::make_unique<PageBuilder>(filename);
-	m_render->RenderDocument(std::move(m_pages));
-	
+	m_pages = std::make_shared<PageBuilder>(m_wnd->GetFilePath());
+	m_render->RenderDocument(m_pages);	
 }
 
 void Control::AddInputListener(InputListener *listener)
@@ -80,6 +75,12 @@ bool Control::frame()
 
 	if (m_wnd->IsResized())
 	{
+	}
+
+	if (m_wnd->IsSearch())
+	{
+		m_pages->SearchOnPage(0, L"Power\0");
+		m_render->SetSearchPages(m_pages);
 	}
 
 	m_render->BeginFrame(m_wnd->GetWindowSize());

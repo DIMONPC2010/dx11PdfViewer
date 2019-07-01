@@ -1,8 +1,8 @@
 #include "PageBuilder.h"
 
-PageBuilder::PageBuilder(std::string filename)
+PageBuilder::PageBuilder(std::wstring filename)
 {
-	m_reader = std::make_unique<PdfReader>();
+	m_reader = std::make_shared<PdfReader>();
 	m_filename = filename;
 	if (m_reader->ReadPdfDocument(filename, 0))
 	{
@@ -47,8 +47,27 @@ float *PageBuilder::GetPage(int page_num)
 		return m_pageDeque[page_num].RGB;
 }
 
-void PageBuilder::SearchOnPage(int page_num)
+void PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 {
+	m_reader->SearchText(page_num, searchtext);
+	m_pageDeque.pop_front();
+	m_pageDeque.pop_front();
+	m_pageDeque.pop_front();
+	m_pageDeque.pop_front();
+
+	Page p;
+	if (m_reader->ReadPdfDocument(m_filename, 0))
+	{
+		p.RGB = m_reader->GetFloatPage();
+		p.width = m_reader->width();
+		p.height = m_reader->height();
+		p.page_num = 0;
+		m_pageDeque.push_front(p);
+		m_pageDeque.push_front(p);
+		m_pageDeque.push_front(p);
+		m_pageDeque.push_front(p);
+	}
+	
 }
 
 int PageBuilder::size()

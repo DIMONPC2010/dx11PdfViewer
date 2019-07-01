@@ -7,20 +7,20 @@ class PdfReader
 public:
 	PdfReader();
 	~PdfReader();
-	bool ReadPdfDocument(std::string filename, int page_num);
+	bool ReadPdfDocument(std::wstring filename, int page_num);
 	int GetDocumentSize();
 	int width();
 	int height();
 	float *GetFloatPage();
 
-	bool SearchText(int page_num);
+	bool SearchText(int page_num, std::wstring searchtext);
 
 private:
 	float aColTofCol(unsigned char color);
 	
 
 
-	const char *m_filename;
+	char m_filename[MAX_PATH];
 	fz_pixmap *m_pix;
 	int m_page_count;
 	float m_zoom;

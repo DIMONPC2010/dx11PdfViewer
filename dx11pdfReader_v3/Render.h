@@ -3,6 +3,7 @@
 #include "PageBuilder.h"
 #include "InputListener.h"
 #include "Window.h"
+#include "SearchEngine.h"
 
 namespace MWRL = Microsoft::WRL;
 
@@ -16,7 +17,7 @@ struct AnimationCounter
 class Render : public InputListener
 {
 private:
-	typedef std::unique_ptr<PageBuilder> PageBuilder_t;
+	typedef std::shared_ptr<PageBuilder> PageBuilder_t;
 
 public:
 	bool KeyPressed(const KeyEvent &arg);
@@ -30,6 +31,7 @@ public:
 	void EndFrame();
 	bool Draw();
 	void RenderDocument(PageBuilder_t pages);
+	void SetSearchPages(PageBuilder_t pages);
 
 	void* operator new(size_t i)
 	{
@@ -95,5 +97,8 @@ private:
 	int m_div[PAGE_NUM];
 	DirectX::XMMATRIX Translation[PAGE_NUM];
 	DirectX::XMMATRIX Scale[PAGE_NUM];
+
+	bool m_searchflag;
+	SearchEngine m_search;
 
 };

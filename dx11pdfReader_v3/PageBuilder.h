@@ -13,13 +13,13 @@ struct Page
 class PageBuilder
 {
 private:
-	typedef std::unique_ptr<PdfReader> PdfReader_t;
+	typedef std::shared_ptr<PdfReader> PdfReader_t;
 
 public:
-	PageBuilder(std::string filename);
+	PageBuilder(std::wstring filename);
 	void GetStartPages();
 	float *GetPage(int page_num);
-	void SearchOnPage(int page_num);
+	void SearchOnPage(int page_num, std::wstring searchtext);
 	int size();
 	int width(int page_num);
 	int height(int page_num);
@@ -28,7 +28,7 @@ public:
 	int NowView();
 
 private:
-	std::string m_filename;
+	std::wstring m_filename;
 	std::deque<Page> m_pageDeque;
 	int m_size;
 protected:

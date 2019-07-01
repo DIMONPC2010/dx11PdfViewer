@@ -7,6 +7,8 @@
 #endif
 
 class InputMgr;
+class OpenDialog;
+class FindDialog;
 
 struct DescWindow
 {
@@ -57,13 +59,14 @@ public:
 		m_isresized = false;
 		return ret;
 	}
+	bool IsSearch();
+
 	DescWindow GetWindowSize();
-	wchar_t * GetFilePath();
+	std::wstring GetFilePath();
 
 	LRESULT WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 private:
 	void updateWindowState();
-	int winfilename(wchar_t *buf, int len);
 	void winsearch();
 
 	static Window *m_wndthis;
@@ -77,11 +80,11 @@ private:
 	bool m_maximized;
 	bool m_isresized;
 
-	wchar_t wfilepath[PATH_MAX];
 
+	OpenDialog *m_open;
+	FindDialog *m_find;
+	//wchar_t *wfilepath;
 	HWND m_dlghwnd;
-	FINDREPLACE m_fr;
-	wchar_t m_szFindWhat[512];
 	UINT m_uFindReplaceMsg;
 
 };

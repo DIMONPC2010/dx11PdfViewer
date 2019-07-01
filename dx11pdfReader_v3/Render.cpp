@@ -37,6 +37,10 @@ bool Render::KeyPressed(const KeyEvent & arg)
 		m_night = true;
 		m_day = false;
 	}
+	if (arg.code == KEY_F)
+	{
+		m_searchflag = true;
+	}
 	return false;
 }
 
@@ -468,7 +472,7 @@ bool Render::Draw()
 
 void Render::RenderDocument(PageBuilder_t pages)
 {
-	m_Doc = std::move(pages);
+	m_Doc = pages;
 
 	/*if (m_pagesNum > m_Doc->size())
 		m_pagesNum = m_Doc->size();*/
@@ -485,6 +489,11 @@ void Render::RenderDocument(PageBuilder_t pages)
 
 	setNextPosValues();
 	m_nowPage = PAGE_NUM;
+}
+
+void Render::SetSearchPages(PageBuilder_t pages)
+{
+	m_Doc = pages;
 }
 
 HRESULT Render::createOnePage(bool push_back, bool push_front)

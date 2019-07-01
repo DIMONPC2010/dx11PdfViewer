@@ -4,15 +4,16 @@
 #include "InputListener.h"
 #include "PageBuilder.h"
 
-class SearchEngine : public InputListener
+class SearchEngine
 {
 private:
-	typedef std::unique_ptr<PdfReader> PdfReader_t;
+	typedef std::unique_ptr<PageBuilder> PageBuilder_t;
 
 public:
-	bool KeyPressed(const KeyEvent &arg);
-
-	SearchEngine();
+	//SearchEngine();
+	//void SetString(wchar_t *searchstring);
+	//void Run();
+	//void UpdateRender();
 
 private:
 	bool m_search;
