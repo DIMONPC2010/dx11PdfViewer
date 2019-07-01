@@ -49,6 +49,7 @@ float *PageBuilder::GetPage(int page_num)
 
 void PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 {
+	m_reader->ReadPdfDocument(m_filename, page_num);
 	m_reader->SearchText(page_num, searchtext);
 	m_pageDeque.pop_front();
 	m_pageDeque.pop_front();
@@ -56,8 +57,7 @@ void PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 	m_pageDeque.pop_front();
 
 	Page p;
-	if (m_reader->ReadPdfDocument(m_filename, 0))
-	{
+
 		p.RGB = m_reader->GetFloatPage();
 		p.width = m_reader->width();
 		p.height = m_reader->height();
@@ -66,7 +66,6 @@ void PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 		m_pageDeque.push_front(p);
 		m_pageDeque.push_front(p);
 		m_pageDeque.push_front(p);
-	}
 	
 }
 

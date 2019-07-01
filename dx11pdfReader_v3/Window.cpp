@@ -100,6 +100,16 @@ bool Window::IsSearch()
 		return m_find->IsSearch();
 }
 
+void Window::SetSearch()
+{
+	m_find->Search(false);
+}
+
+std::wstring Window::SearchString()
+{
+	return m_find->GetSearchString();
+}
+
 DescWindow Window::GetWindowSize()
 {
 	return m_desc;

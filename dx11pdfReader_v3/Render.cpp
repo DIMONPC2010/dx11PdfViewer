@@ -494,6 +494,10 @@ void Render::RenderDocument(PageBuilder_t pages)
 void Render::SetSearchPages(PageBuilder_t pages)
 {
 	m_Doc = pages;
+
+	for (int i = 0; i < m_pagesNum; i++)
+		createStartPages(i);
+	
 }
 
 HRESULT Render::createOnePage(bool push_back, bool push_front)

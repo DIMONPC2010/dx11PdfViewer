@@ -16,6 +16,8 @@ void Control::SetPages()
 {
 	m_pages = std::make_shared<PageBuilder>(m_wnd->GetFilePath());
 	m_render->RenderDocument(m_pages);	
+	
+	//m_render->SetSearchPages(m_pages);
 }
 
 void Control::AddInputListener(InputListener *listener)
@@ -66,8 +68,8 @@ bool Control::frame()
 
 	m_wnd->RunEvent();
 
-	if (!m_wnd->IsActive())
-		return true;
+	/*if (!m_wnd->IsActive())
+		return true;*/
 
 
 	if (m_wnd->IsExit())
@@ -79,8 +81,9 @@ bool Control::frame()
 
 	if (m_wnd->IsSearch())
 	{
-		m_pages->SearchOnPage(0, L"Power\0");
+		m_pages->SearchOnPage(0, m_wnd->SearchString());
 		m_render->SetSearchPages(m_pages);
+		m_wnd->SetSearch();
 	}
 
 	m_render->BeginFrame(m_wnd->GetWindowSize());

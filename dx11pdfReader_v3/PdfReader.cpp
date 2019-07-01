@@ -33,9 +33,15 @@ int PdfReader::height()
 
 bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 {
+	wchar_t filename[MAX_PATH];
+	int code = MultiByteToWideChar(CP_UTF8, 0, m_filename, -1, filename, MAX_PATH);
+	if (code == 0)
+		MessageBox(nullptr, L"Не удалось конвертировать в wchar*", L"Error", MB_OK);
+	ReadPdfDocument(filename, page_num);
+
 	char searchtxt[MAX_PATH];
 
-	int code = WideCharToMultiByte(CP_UTF8, 0, searchtext.c_str(), -1, searchtxt, MAX_PATH, NULL, NULL);
+	code = WideCharToMultiByte(CP_UTF8, 0, searchtext.c_str(), -1, searchtxt, MAX_PATH, NULL, NULL);
 	if (code == 0)
 		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
 
@@ -76,9 +82,10 @@ bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 	//do
 	//{
 		hit_count = fz_search_stext_page(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
-	//} 
-	//while (page != firstpage);
-		fz_invert_pixmap_rect(m_ctx, m_pix, fz_round_rect(fz_rect_from_quad(m_hit_bbox[0])));
+	//}
+	for(int i = 0; i < hit_count; i++)
+		fz_invert_pixmap_rect(m_ctx, m_pix, fz_round_rect(fz_rect_from_quad(m_hit_bbox[i])));
+		
 		//pixmapToDocForRender();
 
 		return true;
@@ -190,48 +197,3 @@ float *PdfReader::GetFloatPage()
 
 	return page;
 }
-
-/*void PdfReader::pixmapToDocForRender()
-{
-	int width = 0;
-	int height = 0;
-	int c = 0;
-
-	m_pagesRGB = new Page[m_page_count + 7];
-	int pix_count = 0;
-
-	for (int i = 3; i < m_page_count + 3; ++i)
-	{
-		m_pagesRGB[i].width = m_pix[pix_count]->w;
-		m_pagesRGB[i].height = m_pix[pix_count]->h;
-		width = m_pix[pix_count]->w;
-		height = m_pix[pix_count]->h;
-
-		m_pagesRGB[i].RGB = new float[width * height * 4];
-
-
-		c = 0;
-
-		for (int y = 0; y < height; ++y)
-		{
-			unsigned char *p = &m_pix[pix_count]->samples[y * m_pix[pix_count]->stride];
-			for (int x = 0; x < width; ++x)
-			{
-				m_pagesRGB[i].RGB[c] = aColTofCol(p[0]);
-				m_pagesRGB[i].RGB[c + 1] = aColTofCol(p[1]);
-				m_pagesRGB[i].RGB[c + 2] = aColTofCol(p[2]);
-				m_pagesRGB[i].RGB[c + 3] = 1.0f;
-				c += 4;
-				p += m_pix[pix_count]->n;
-			}
-		}
-		pix_count++;
-	}
-	m_pagesRGB[0] = m_pagesRGB[3];
-	m_pagesRGB[1] = m_pagesRGB[3];
-	m_pagesRGB[2] = m_pagesRGB[3];
-
-	for(int i = 3; i < 7; i++)
-		m_pagesRGB[m_page_count + i] = m_pagesRGB[m_page_count + 1];
-
-}*/

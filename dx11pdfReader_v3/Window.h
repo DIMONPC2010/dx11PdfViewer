@@ -60,6 +60,8 @@ public:
 		return ret;
 	}
 	bool IsSearch();
+	void SetSearch();
+	std::wstring SearchString();
 
 	DescWindow GetWindowSize();
 	std::wstring GetFilePath();
