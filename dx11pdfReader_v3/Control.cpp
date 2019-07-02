@@ -5,6 +5,9 @@ Control::Control() :  m_wnd(nullptr)
 					 ,m_render(nullptr)
 					 ,m_input(nullptr)
 					 ,m_init(false)
+					 ,m_search_page(0)
+					 ,m_not_found(true)
+					 ,m_last(false)
 {
 }
 
@@ -81,9 +84,62 @@ bool Control::frame()
 
 	if (m_wnd->IsSearch())
 	{
-		m_pages->SearchOnPage(0, m_wnd->SearchString());
-		m_render->SetSearchPages(m_pages);
-		m_wnd->SetSearch();
+		if (m_wnd->SearchString() != prevSearch && (m_search_page != 0 || m_last == true))
+		{
+			m_search_page = 0;
+			m_last = false;
+			m_pages = std::make_shared<PageBuilder>(m_wnd->GetFilePath());
+			if (m_pages->SearchOnPage(m_search_page, m_wnd->SearchString()))
+			{
+				m_render->SetSearchPages(m_pages);
+				m_wnd->SetSearch();
+				m_not_found = false;
+			}
+			//m_search_page++;
+		}
+		else if (m_wnd->SearchString() == prevSearch && m_search_page == 0)
+		{
+			m_pages = std::make_shared<PageBuilder>(m_wnd->GetFilePath());
+			if (m_pages->SearchOnPage(m_search_page, m_wnd->SearchString()))
+			{
+				m_render->SetSearchPages(m_pages);
+				m_wnd->SetSearch();
+				m_not_found = false;
+			}
+			m_search_page++;
+			if (m_not_found)
+			{
+				m_search_page = 0;
+				m_wnd->SetSearch();
+				std::wstring message = L"Не найдено " + m_wnd->SearchString();
+				MessageBox(nullptr, message.c_str(), L"Поиск", MB_OK);
+			}
+		}
+		else if (m_search_page != m_pages->size() - 1)
+		{
+			if (m_pages->SearchOnPage(m_search_page, m_wnd->SearchString()))
+			{
+				m_render->SetSearchPages(m_pages);
+				m_wnd->SetSearch();
+				m_not_found = false;
+			}
+			m_search_page++;
+		}
+		else if (m_search_page == m_pages->size() - 1)
+		{
+			if (m_pages->SearchOnPage(m_search_page, m_wnd->SearchString()))
+			{
+				m_render->SetSearchPages(m_pages);
+				m_wnd->SetSearch();
+				m_not_found = false;
+			}
+			m_search_page = 0;
+			m_last = true;
+		}
+		else
+			m_search_page++;
+		prevSearch = m_wnd->SearchString();
+		
 	}
 
 	m_render->BeginFrame(m_wnd->GetWindowSize());

@@ -38,4 +38,9 @@ private:
 	SearchEngin_t m_search;
 	bool m_init;
 
+	int m_search_page;
+	std::wstring prevSearch;
+	bool m_not_found;
+	bool m_last;
+
 };

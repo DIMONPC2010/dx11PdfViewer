@@ -14,7 +14,7 @@ PageBuilder::PageBuilder(std::wstring filename)
 void PageBuilder::GetStartPages()
 {
 	Page p;
-	p.RGB = m_reader->GetFloatPage();
+	p.RGB = m_reader->GetUNORMPage();
 	p.width = m_reader->width();
 	p.height = m_reader->height();
 	p.page_num = 0;
@@ -33,7 +33,7 @@ void PageBuilder::GetStartPages()
 	{
 		if (m_reader->ReadPdfDocument(m_filename, i))
 		{
-			p.RGB = m_reader->GetFloatPage();
+			p.RGB = m_reader->GetUNORMPage();
 			p.width = m_reader->width();
 			p.height = m_reader->height();
 			p.page_num = i;
@@ -42,31 +42,56 @@ void PageBuilder::GetStartPages()
 	}
 }
 
-float *PageBuilder::GetPage(int page_num)
+unsigned char *PageBuilder::GetPage(int page_num)
 {
 		return m_pageDeque[page_num].RGB;
 }
-
-void PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
+bool PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 {
-	m_reader->ReadPdfDocument(m_filename, page_num);
-	m_reader->SearchText(page_num, searchtext);
-	m_pageDeque.pop_front();
-	m_pageDeque.pop_front();
-	m_pageDeque.pop_front();
-	m_pageDeque.pop_front();
+	if (page_num == 0)
+	{
+		if (m_reader->ReadPdfDocument(m_filename, page_num))
+		{
+			if (m_reader->SearchText(page_num, searchtext))
+			{
 
-	Page p;
+				Page p;
 
-		p.RGB = m_reader->GetFloatPage();
-		p.width = m_reader->width();
-		p.height = m_reader->height();
-		p.page_num = 0;
-		m_pageDeque.push_front(p);
-		m_pageDeque.push_front(p);
-		m_pageDeque.push_front(p);
-		m_pageDeque.push_front(p);
-	
+				p.RGB = m_reader->GetUNORMPage();
+				p.width = m_reader->width();
+				p.height = m_reader->height();
+				p.page_num = page_num;
+				m_pageDeque.at(3) = p;
+
+				return true;
+			}
+			
+		}
+	}
+	else
+	{
+		if (m_reader->ReadPdfDocument(m_filename, page_num))
+		{
+			if (m_reader->SearchText(page_num, searchtext))
+			{
+
+				Page p;
+
+				p.RGB = m_reader->GetUNORMPage();
+				p.width = m_reader->width();
+				p.height = m_reader->height();
+				p.page_num = page_num;
+				while (m_pageDeque.at(3).page_num != page_num)
+					GetNext();
+
+				m_pageDeque.at(3) = p;
+
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 int PageBuilder::size()
@@ -94,7 +119,7 @@ void PageBuilder::GetNext()
 		int lastPage = m_pageDeque.back().page_num;
 		if (m_reader->ReadPdfDocument(m_filename, lastPage + 1))
 		{
-			p.RGB = m_reader->GetFloatPage();
+			p.RGB = m_reader->GetUNORMPage();
 			p.width = m_reader->width();
 			p.height = m_reader->height();
 			p.page_num = lastPage + 1;
@@ -124,7 +149,7 @@ void PageBuilder::GetPrevious()
 		int firstPage = m_pageDeque.front().page_num;
 		if (m_reader->ReadPdfDocument(m_filename, firstPage - 1))
 		{
-			p.RGB = m_reader->GetFloatPage();
+			p.RGB = m_reader->GetUNORMPage();
 			p.width = m_reader->width();
 			p.height = m_reader->height();
 			p.page_num = firstPage - 1;

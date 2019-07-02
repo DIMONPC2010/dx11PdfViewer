@@ -11,7 +11,7 @@ public:
 	int GetDocumentSize();
 	int width();
 	int height();
-	float *GetFloatPage();
+	unsigned char *GetUNORMPage();
 
 	bool SearchText(int page_num, std::wstring searchtext);
 

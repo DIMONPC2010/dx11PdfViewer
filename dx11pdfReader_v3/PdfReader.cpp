@@ -88,7 +88,10 @@ bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 		
 		//pixmapToDocForRender();
 
+	if (hit_count > 0)
 		return true;
+	else
+		return false;
 }
 
 
@@ -152,7 +155,13 @@ bool PdfReader::ReadPdfDocument(std::wstring filename, int page_num)
 
 	/* Render page to an RGB pixmap. */
 	fz_try(m_ctx)
-		m_pix = fz_new_pixmap_from_page_number(m_ctx, m_doc, page_num, m_ctm, fz_device_rgb(m_ctx), NULL);
+	{
+		fz_page *page;
+		m_pix = NULL;
+		page = fz_load_page(m_ctx, m_doc, page_num);
+		m_pix = fz_new_pixmap_from_page(m_ctx, page, m_ctm, fz_device_rgb(m_ctx), 0);
+		//m_pix = fz_new_pixmap_from_page_number(m_ctx, m_doc, page_num, m_ctm, fz_device_rgb(m_ctx), 1);
+	}
 	fz_catch(m_ctx)
 	{
 		MessageBox(nullptr, L"Не удалось запомнить страницу", L"Error", MB_OK);
@@ -160,6 +169,7 @@ bool PdfReader::ReadPdfDocument(std::wstring filename, int page_num)
 		fz_drop_context(m_ctx);
 		return EXIT_FAILURE;
 	}
+
 
 	return true;
 }
@@ -170,7 +180,7 @@ float PdfReader::aColTofCol(unsigned char color)
 	return (float)value * C_BTOF;
 }
 
-float *PdfReader::GetFloatPage()
+unsigned char *PdfReader::GetUNORMPage()
 {
 	int width = 0;
 	int height = 0;
@@ -179,17 +189,17 @@ float *PdfReader::GetFloatPage()
 	width = m_pix->w;
 	height = m_pix->h;
 
-	float *page = new float[width * height * 4];
+	unsigned char *page = new unsigned char[width * height * 4];
 
 	for (int y = 0; y < height; ++y)
 	{
 		unsigned char *p = &m_pix->samples[y * m_pix->stride];
 		for (int x = 0; x < width; ++x)
 		{
-			page[c] = aColTofCol(p[0]);
-			page[c + 1] = aColTofCol(p[1]);
-			page[c + 2] = aColTofCol(p[2]);
-			page[c + 3] = 1.0f;
+			page[c] = p[0];
+			page[c + 1] = p[1];
+			page[c + 2] = p[2];
+			page[c + 3] = 'я';
 			c += 4;
 			p += m_pix->n;
 		}

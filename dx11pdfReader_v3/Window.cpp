@@ -134,6 +134,13 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case FR_DIALOGTERM:
 			m_find->Search(false);
+			return 0;
+		case FR_DOWN:
+			return 0;
+		case FR_MATCHCASE:
+			return 0;
+		case FR_WHOLEWORD:
+			return 0;
 		}
 	}
 

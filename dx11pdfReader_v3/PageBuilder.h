@@ -4,7 +4,7 @@
 
 struct Page
 {
-	float *RGB;
+	unsigned char *RGB;
 	int width;
 	int height;
 	int page_num;
@@ -18,8 +18,8 @@ private:
 public:
 	PageBuilder(std::wstring filename);
 	void GetStartPages();
-	float *GetPage(int page_num);
-	void SearchOnPage(int page_num, std::wstring searchtext);
+	unsigned char *GetPage(int page_num);
+	bool SearchOnPage(int page_num, std::wstring searchtext);
 	int size();
 	int width(int page_num);
 	int height(int page_num);

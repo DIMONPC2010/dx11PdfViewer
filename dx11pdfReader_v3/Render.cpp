@@ -503,7 +503,7 @@ void Render::SetSearchPages(PageBuilder_t pages)
 HRESULT Render::createOnePage(bool push_back, bool push_front)
 {
 	HRESULT hr = S_OK;
-	int bpp = 16;
+	int bpp = 4;
 	int nb_color = 4;
 
 	int nowPage = 0;
@@ -533,7 +533,7 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
@@ -544,7 +544,7 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 	if (SUCCEEDED(hr))
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-		SRVDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		SRVDesc.Texture2D.MipLevels = -1;
 
@@ -580,7 +580,7 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 HRESULT Render::createStartPages(int i)
 {
 	HRESULT hr = S_OK;
-	int bpp = 16;
+	int bpp = 4;
 	int nb_color = 4;
 
 	D3D11_SUBRESOURCE_DATA tbsd;
@@ -598,7 +598,7 @@ HRESULT Render::createStartPages(int i)
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
@@ -610,7 +610,7 @@ HRESULT Render::createStartPages(int i)
 	if (SUCCEEDED(hr))
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-		SRVDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		SRVDesc.Texture2D.MipLevels = -1;
 
