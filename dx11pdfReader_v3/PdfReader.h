@@ -14,6 +14,7 @@ public:
 	unsigned char *GetUNORMPage();
 
 	bool SearchText(int page_num, std::wstring searchtext);
+	void SetCaseSensitiveSearch(bool aState);
 
 private:
 	float aColTofCol(unsigned char color);
@@ -36,4 +37,5 @@ private:
 	int searchpage;
 	fz_quad m_hit_bbox[512];
 	int hit_count;
+	int m_case_sensitive;
 };

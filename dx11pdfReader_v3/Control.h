@@ -42,5 +42,7 @@ private:
 	std::wstring prevSearch;
 	bool m_not_found;
 	bool m_last;
+	bool m_first;
+	bool m_forward_search;
 
 };

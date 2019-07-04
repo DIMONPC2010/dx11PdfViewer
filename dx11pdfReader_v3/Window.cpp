@@ -110,6 +110,21 @@ std::wstring Window::SearchString()
 	return m_find->GetSearchString();
 }
 
+bool Window::GetFindDlgFlagDown()
+{
+	return m_find->GetFrDown();
+}
+
+bool Window::GetFindDlgFlagMachCase()
+{
+	return m_find->GetFrMatchCase();
+}
+
+bool Window::GetFindDlgFlagWholeWord()
+{
+	return m_find->GetFrWholeWord();
+}
+
 DescWindow Window::GetWindowSize()
 {
 	return m_desc;
@@ -127,23 +142,19 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 	if (nMsg == m_uFindReplaceMsg)
 	{
 		fr = (LPFINDREPLACE)lParam;
-		switch (fr->Flags)
+		if (fr->Flags & FR_FINDNEXT)
 		{
-		case FR_FINDNEXT:
 			m_find->Search(true);
-			return 0;
-		case FR_DIALOGTERM:
+			m_find->SetFrDown((bool)(fr->Flags & FR_DOWN));
+			m_find->SetFrWholeWord((bool)(fr->Flags & FR_WHOLEWORD));
+			m_find->SetFrMatchCase((bool)(fr->Flags & FR_MATCHCASE));
+		}
+		if (fr->Flags & FR_DIALOGTERM)
+		{
 			m_find->Search(false);
-			return 0;
-		case FR_DOWN:
-			return 0;
-		case FR_MATCHCASE:
-			return 0;
-		case FR_WHOLEWORD:
-			return 0;
 		}
 	}
-
+	
 	switch (nMsg)
 	{
 	case WM_CREATE:

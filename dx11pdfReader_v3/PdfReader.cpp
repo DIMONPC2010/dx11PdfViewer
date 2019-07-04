@@ -1,10 +1,12 @@
 #include "PdfReader.h"
 #define C_BTOF 0.00392156862745 
 
+
 PdfReader::PdfReader() :
 	 m_zoom(100)
 	,m_rotate(0)
 	,m_page_count(0)
+	,m_case_sensitive(false)
 {
 }
 
@@ -81,7 +83,9 @@ bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 
 	//do
 	//{
-		hit_count = fz_search_stext_page(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
+	int q = (int)m_case_sensitive;
+		hit_count = fz_search_stext_page_case_sensitive(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]), (int)m_case_sensitive);
+		//hit_count = fz_search_stext_page(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
 	//}
 	for(int i = 0; i < hit_count; i++)
 		fz_invert_pixmap_rect(m_ctx, m_pix, fz_round_rect(fz_rect_from_quad(m_hit_bbox[i])));
@@ -206,4 +210,9 @@ unsigned char *PdfReader::GetUNORMPage()
 	}
 
 	return page;
+}
+
+void PdfReader::SetCaseSensitiveSearch(bool aState)
+{
+	m_case_sensitive = aState;
 }

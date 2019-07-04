@@ -19,7 +19,9 @@ public:
 	PageBuilder(std::wstring filename);
 	void GetStartPages();
 	unsigned char *GetPage(int page_num);
-	bool SearchOnPage(int page_num, std::wstring searchtext);
+	bool SearchOnPageForward(int page_num, std::wstring searchtext);
+	bool SearchOnPageBackward(int page_num, std::wstring searchtext);
+	void SetCaseSensitiveSearch(bool aState);
 	int size();
 	int width(int page_num);
 	int height(int page_num);

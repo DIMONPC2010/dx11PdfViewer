@@ -46,7 +46,7 @@ unsigned char *PageBuilder::GetPage(int page_num)
 {
 		return m_pageDeque[page_num].RGB;
 }
-bool PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
+bool PageBuilder::SearchOnPageForward(int page_num, std::wstring searchtext)
 {
 	if (page_num == 0)
 	{
@@ -92,6 +92,36 @@ bool PageBuilder::SearchOnPage(int page_num, std::wstring searchtext)
 	}
 
 	return false;
+}
+
+bool PageBuilder::SearchOnPageBackward(int page_num, std::wstring searchtext)
+{
+	if (m_reader->ReadPdfDocument(m_filename, page_num))
+	{
+		if (m_reader->SearchText(page_num, searchtext))
+		{
+
+			Page p;
+
+			p.RGB = m_reader->GetUNORMPage();
+			p.width = m_reader->width();
+			p.height = m_reader->height();
+			p.page_num = page_num;
+			while (m_pageDeque.at(3).page_num != page_num)
+				GetPrevious();
+
+			m_pageDeque.at(3) = p;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void PageBuilder::SetCaseSensitiveSearch(bool aState)
+{
+	m_reader->SetCaseSensitiveSearch(aState);
 }
 
 int PageBuilder::size()

@@ -62,6 +62,9 @@ public:
 	bool IsSearch();
 	void SetSearch();
 	std::wstring SearchString();
+	bool GetFindDlgFlagDown();
+	bool GetFindDlgFlagMachCase();
+	bool GetFindDlgFlagWholeWord();
 
 	DescWindow GetWindowSize();
 	std::wstring GetFilePath();
