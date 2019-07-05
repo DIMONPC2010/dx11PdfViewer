@@ -83,12 +83,12 @@ bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 
 	//do
 	//{
-	int q = (int)m_case_sensitive;
 		hit_count = fz_search_stext_page_case_sensitive(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]), (int)m_case_sensitive);
 		//hit_count = fz_search_stext_page(m_ctx, page_text, searchtxt, m_hit_bbox, sizeof(m_hit_bbox) / sizeof(m_hit_bbox[0]));
 	//}
 	for(int i = 0; i < hit_count; i++)
 		fz_invert_pixmap_rect(m_ctx, m_pix, fz_round_rect(fz_rect_from_quad(m_hit_bbox[i])));
+
 		
 		//pixmapToDocForRender();
 
@@ -175,6 +175,24 @@ bool PdfReader::ReadPdfDocument(std::wstring filename, int page_num)
 	}
 
 
+
+	m_ctm = fz_scale(100.0f / 100.0f, 100.0f / 100.0f);
+
+	fz_try(m_ctx)
+	{
+		fz_page *page;
+		m_pix = NULL;
+		page = fz_load_page(m_ctx, m_doc, page_num);
+		m_pix = fz_new_pixmap_from_page(m_ctx, page, m_ctm, fz_device_rgb(m_ctx), 0);
+		fz_save_pixmap_as_png(m_ctx, m_pix, "d:\\pixmap.png");
+	}
+	fz_catch(m_ctx)
+	{
+		MessageBox(nullptr, L"Не удалось записать пнг", L"Error", MB_OK);
+		fz_drop_document(m_ctx, m_doc);
+		fz_drop_context(m_ctx);
+		return EXIT_FAILURE;
+	}
 	return true;
 }
 

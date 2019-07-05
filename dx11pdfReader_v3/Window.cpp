@@ -2,6 +2,7 @@
 #include "InputMgr.h"
 #include "OpenDialog.h"
 #include "FindDialog.h"
+#include "ResolutionDialog.h"
 
 Window *Window::m_wndthis = nullptr;
 
@@ -65,6 +66,10 @@ bool Window::Create(const DescWindow &desc)
 		return false;
 	}
 
+	HMENU hmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAINMENU));
+	SetMenu(m_hwnd, hmenu);
+
+
 	ShowWindow(m_hwnd, SW_SHOW);
 	UpdateWindow(m_hwnd);
 
@@ -123,6 +128,12 @@ bool Window::GetFindDlgFlagMachCase()
 bool Window::GetFindDlgFlagWholeWord()
 {
 	return m_find->GetFrWholeWord();
+}
+
+void Window::SetPageResolution(int width, int height)
+{
+	m_page_width = width;
+	m_page_height = height;
 }
 
 DescWindow Window::GetWindowSize()
@@ -215,6 +226,10 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 			m_find = new FindDialog(this);
 			m_dlghwnd = m_find->GetDlgHWND();
 		}
+		else if (wParam == KEY_CTRL)
+		{
+			m_resolution = new ResolutionDialog(this, m_page_width, m_page_height);
+		}
 		else if (m_inputmgr)
 			m_inputmgr->Run(nMsg, wParam, lParam);
 		return 0;
@@ -239,18 +254,6 @@ void Window::updateWindowState()
 	if (m_inputmgr)
 		m_inputmgr->SetWinRect(ClientRect);
 }
-
-/*void Window::winsearch()
-{
-	memset(&m_fr, 0, sizeof(FINDREPLACE));
-	m_fr.lStructSize = sizeof(FINDREPLACE);
-	m_fr.hwndOwner = m_hwnd;
-	m_fr.lpstrFindWhat = m_szFindWhat;
-	m_fr.wFindWhatLen = 512;
-	m_fr.Flags = 0;
-	m_dlghwnd =	FindTextW(&m_fr);
-
-}*/
 
 LRESULT CALLBACK StaticWndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {

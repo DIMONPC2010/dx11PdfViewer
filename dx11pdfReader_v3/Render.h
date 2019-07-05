@@ -32,6 +32,7 @@ public:
 	bool Draw();
 	void RenderDocument(PageBuilder_t pages);
 	void SetSearchPages(PageBuilder_t pages);
+	PageBuilder_t GetDocument();
 
 	void* operator new(size_t i)
 	{
@@ -97,8 +98,5 @@ private:
 	int m_div[PAGE_NUM];
 	DirectX::XMMATRIX Translation[PAGE_NUM];
 	DirectX::XMMATRIX Scale[PAGE_NUM];
-
-	bool m_searchflag;
-	SearchEngine m_search;
 
 };

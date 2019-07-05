@@ -1,4 +1,5 @@
 #include "FindDialog.h"
+#include <dlgs.h>
 
 FindDialog::FindDialog(Window *wind) : Dialog(wind)
 			,m_fr_down(false)
@@ -15,9 +16,9 @@ FindDialog::FindDialog(Window *wind) : Dialog(wind)
 	m_search = false;
 
 	
-	HWND hwndRadioButton = GetDlgItem(m_dlghwnd, 1056);
+	HWND hwndRadioButton = GetDlgItem(m_dlghwnd, rad1);
 	SetWindowText(hwndRadioButton, L"Вперед");
-	hwndRadioButton = GetDlgItem(m_dlghwnd, 1057);
+	hwndRadioButton = GetDlgItem(m_dlghwnd, rad2);
 	SetWindowText(hwndRadioButton, L"Назад");
 }
 

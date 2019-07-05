@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "resource.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
@@ -9,6 +10,7 @@
 class InputMgr;
 class OpenDialog;
 class FindDialog;
+class ResolutionDialog;
 
 struct DescWindow
 {
@@ -66,6 +68,8 @@ public:
 	bool GetFindDlgFlagMachCase();
 	bool GetFindDlgFlagWholeWord();
 
+	void SetPageResolution(int width, int height);
+
 	DescWindow GetWindowSize();
 	std::wstring GetFilePath();
 
@@ -88,6 +92,8 @@ private:
 
 	OpenDialog *m_open;
 	FindDialog *m_find;
+	ResolutionDialog *m_resolution;
+	int m_page_width, m_page_height;
 	//wchar_t *wfilepath;
 	HWND m_dlghwnd;
 	UINT m_uFindReplaceMsg;

@@ -37,10 +37,6 @@ bool Render::KeyPressed(const KeyEvent & arg)
 		m_night = true;
 		m_day = false;
 	}
-	if (arg.code == KEY_F)
-	{
-		m_searchflag = true;
-	}
 	return false;
 }
 
@@ -498,6 +494,11 @@ void Render::SetSearchPages(PageBuilder_t pages)
 	for (int i = 0; i < m_pagesNum; i++)
 		createStartPages(i);
 	
+}
+
+std::shared_ptr<PageBuilder> Render::GetDocument()
+{
+	return m_Doc;
 }
 
 HRESULT Render::createOnePage(bool push_back, bool push_front)

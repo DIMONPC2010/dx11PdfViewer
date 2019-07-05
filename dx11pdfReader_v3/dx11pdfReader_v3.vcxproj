@@ -161,6 +161,7 @@
     <ClCompile Include="PageBuilder.cpp" />
     <ClCompile Include="PdfReader.cpp" />
     <ClCompile Include="Render.cpp" />
+    <ClCompile Include="ResolutionDialog.cpp" />
     <ClCompile Include="SearchEngine.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -175,9 +176,14 @@
     <ClInclude Include="PageBuilder.h" />
     <ClInclude Include="PdfReader.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="ResolutionDialog.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SearchEngine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="dx11pdfReader_v3.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

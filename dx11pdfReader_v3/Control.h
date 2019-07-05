@@ -14,7 +14,7 @@ private:
 	typedef std::shared_ptr<Render> Render_t;
 	typedef std::shared_ptr<InputMgr> InputMgr_t;
 	typedef std::shared_ptr<PageBuilder> PageBuilder_t;
-	typedef std::unique_ptr<SearchEngine> SearchEngin_t;
+	typedef std::shared_ptr<SearchEngine> SearchEngine_t;
 
 public: 
 	Control();
@@ -35,14 +35,6 @@ private:
 	Render_t m_render;
 	InputMgr_t m_input;
 	PageBuilder_t m_pages;
-	SearchEngin_t m_search;
+	SearchEngine_t m_search;
 	bool m_init;
-
-	int m_search_page;
-	std::wstring prevSearch;
-	bool m_not_found;
-	bool m_last;
-	bool m_first;
-	bool m_forward_search;
-
 };
