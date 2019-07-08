@@ -13,10 +13,15 @@ Window::Window(void) :
 	m_active(true),
 	m_minimized(false),
 	m_maximized(false),
-	m_isresized(false)
+	m_isresized(false),
+	m_dlgflags(OFN_FILEMUSTEXIST | OFN_HIDEREADONLY)
 {
 	if (!m_wndthis)
+	{
 		m_wndthis = this;
+		m_dlgtitle = L"Open PDF file";
+		m_dlgfilter = L"Documents (*.pdf;*.xps;*.cbz;*.epub;*.fb2;*.zip;*.png;*.jpeg;*.tiff)\0*.zip;*.cbz;*.xps;*.epub;*.fb2;*.pdf;*.jpe;*.jpg;*.jpeg;*.jfif;*.tif;*.tiff\0PDF Files (*.pdf)\0*.pdf\0XPS Files (*.xps)\0*.xps\0CBZ Files (*.cbz;*.zip)\0*.zip;*.cbz\0EPUB Files (*.epub)\0*.epub\0FictionBook 2 Files (*.fb2)\0*.fb2\0Image Files (*.png;*.jpeg;*.tiff)\0*.png;*.jpg;*.jpe;*.jpeg;*.jfif;*.tif;*.tiff\0All Files\0*\0\0";
+	}
 	else
 		MessageBox(nullptr, L"Window уже был создан", L"Error", MB_OK);
 }
@@ -169,7 +174,7 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 	switch (nMsg)
 	{
 	case WM_CREATE:
-		m_open = new OpenDialog(this);;
+		m_open = new OpenDialog(this, m_dlgtitle, m_dlgfilter, m_dlgflags);
 		if (!m_open->getOpenFileName())
 			exit(0);
 		return 0;

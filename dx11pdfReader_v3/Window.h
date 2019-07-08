@@ -91,6 +91,10 @@ private:
 
 
 	OpenDialog *m_open;
+	wchar_t *m_dlgtitle;
+	wchar_t *m_dlgfilter;
+	DWORD m_dlgflags;
+
 	FindDialog *m_find;
 	ResolutionDialog *m_resolution;
 	int m_page_width, m_page_height;

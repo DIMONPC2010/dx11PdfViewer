@@ -4,7 +4,7 @@
 class OpenDialog : public Dialog
 {
 public:
-	OpenDialog(Window *wind);
+	OpenDialog(Window *wind, wchar_t *title, wchar_t *filter, DWORD flags);
 	int getOpenFileName();
 	std::wstring getFileName();
 
