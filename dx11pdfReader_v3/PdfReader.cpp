@@ -91,6 +91,7 @@ bool PdfReader::SearchText(int page_num, std::wstring searchtext)
 
 		
 		//pixmapToDocForRender();
+	//fz_bookmark dsad = fz_make_bookmark(m_ctx, m_doc, 2);
 
 	if (hit_count > 0)
 		return true;
