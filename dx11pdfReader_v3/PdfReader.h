@@ -16,6 +16,8 @@ public:
 	bool SearchText(int page_num, std::wstring searchtext);
 	void SetCaseSensitiveSearch(bool aState);
 
+	void SaveImage(int page_num, float percent, std::wstring path);
+
 private:
 	float aColTofCol(unsigned char color);
 	

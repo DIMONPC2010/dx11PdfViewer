@@ -2,7 +2,7 @@
 
 ResolutionDialog *ResolutionDialog::m_wndthis = nullptr;
 
-ResolutionDialog::ResolutionDialog(Window * wind, int width, int height) : Dialog(wind), m_width(width), m_height(height), m_percent(100), m_text_changed(false), m_start_height(height), m_start_width(width), m_start_percent(100)
+ResolutionDialog::ResolutionDialog(Window * wind, int width, int height) : Dialog(wind), m_width(width), m_height(height), m_percent(100), m_text_changed(false), m_start_height(height), m_start_width(width), m_start_percent(100), m_dialog_ok(false)
 {
 	if (!m_wndthis)
 		m_wndthis = this;
@@ -22,11 +22,21 @@ BOOL ResolutionDialog::ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wPar
 		hwndEditPercent = GetDlgItem(hwndDlg, IDC_EDIT_PERCENT);
 		updateDlgWindowText();
 		return FALSE;
+	case WM_CLOSE:
+		m_dialog_ok = false;
+		m_wndthis = nullptr;
+		EndDialog(hwndDlg, 0);
+		return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
 		case IDOK:
+			m_dialog_ok = true;
+			m_wndthis = nullptr;
+			EndDialog(hwndDlg, 0);
+			return TRUE;
 		case IDCANCEL:
+			m_dialog_ok = false;
 			m_wndthis = nullptr;
 			EndDialog(hwndDlg, 0);
 			return TRUE;
@@ -83,6 +93,11 @@ BOOL ResolutionDialog::ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wPar
 float ResolutionDialog::GetPercent()
 {
 	return (float)m_percent;
+}
+
+bool ResolutionDialog::ButtonOKPressed()
+{
+	return m_dialog_ok;
 }
 
 void ResolutionDialog::updateDlgWindowText()

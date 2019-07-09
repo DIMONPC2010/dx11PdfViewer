@@ -18,6 +18,11 @@ int OpenDialog::getOpenFileName()
 	return GetOpenFileNameW(&this->ofn);;
 }
 
+int OpenDialog::getSaveFileName()
+{
+	return GetSaveFileNameW(&this->ofn);
+}
+
 std::wstring OpenDialog::getFileName()
 {
 	return m_szFileName;

@@ -73,6 +73,14 @@ public:
 	DescWindow GetWindowSize();
 	std::wstring GetFilePath();
 
+	bool IsSaveImage();
+	void SetSaveImage(bool aState);
+	std::wstring GetSaveFilePath();
+	float GetPercent();
+
+	bool IsOpenFile();
+	void SetOpenFlag(bool aState);
+
 	LRESULT WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 private:
 	void updateWindowState();
@@ -94,6 +102,11 @@ private:
 	wchar_t *m_dlgtitle;
 	wchar_t *m_dlgfilter;
 	DWORD m_dlgflags;
+	bool m_open_flag;
+
+	OpenDialog *m_save;
+	float m_percent_value;
+	bool m_save_flag;
 
 	FindDialog *m_find;
 	ResolutionDialog *m_resolution;
@@ -101,6 +114,8 @@ private:
 	//wchar_t *wfilepath;
 	HWND m_dlghwnd;
 	UINT m_uFindReplaceMsg;
+
+	bool m_day_flag;
 
 };
 

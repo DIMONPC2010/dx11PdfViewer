@@ -10,6 +10,7 @@ public:
 	ResolutionDialog(Window *wind, int width, int height);
 	BOOL ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	float GetPercent();
+	bool ButtonOKPressed();
 
 private:
 	void updateDlgWindowText();
@@ -29,6 +30,7 @@ private:
 	HWND hwndEditPercent;
 	wchar_t m_view_buff[15];
 	bool m_text_changed;
+	bool m_dialog_ok;
 };
 
 static BOOL CALLBACK ResolutionDlgProc(HWND hwndDlg, UINT nMsg, WPARAM wParam, LPARAM lParam);

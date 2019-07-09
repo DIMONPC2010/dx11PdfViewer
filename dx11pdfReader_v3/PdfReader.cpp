@@ -174,25 +174,6 @@ bool PdfReader::ReadPdfDocument(std::wstring filename, int page_num)
 		return EXIT_FAILURE;
 	}
 
-
-
-	m_ctm = fz_scale(100.0f / 100.0f, 100.0f / 100.0f);
-
-	fz_try(m_ctx)
-	{
-		fz_page *page;
-		m_pix = NULL;
-		page = fz_load_page(m_ctx, m_doc, page_num);
-		m_pix = fz_new_pixmap_from_page(m_ctx, page, m_ctm, fz_device_rgb(m_ctx), 0);
-		fz_save_pixmap_as_png(m_ctx, m_pix, "d:\\pixmap.png");
-	}
-	fz_catch(m_ctx)
-	{
-		MessageBox(nullptr, L"Не удалось записать пнг", L"Error", MB_OK);
-		fz_drop_document(m_ctx, m_doc);
-		fz_drop_context(m_ctx);
-		return EXIT_FAILURE;
-	}
 	return true;
 }
 
@@ -233,4 +214,31 @@ unsigned char *PdfReader::GetUNORMPage()
 void PdfReader::SetCaseSensitiveSearch(bool aState)
 {
 	m_case_sensitive = aState;
+}
+
+void PdfReader::SaveImage(int page_num, float percent, std::wstring path)
+{
+	char cpath[MAX_PATH];
+
+	int code = WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, cpath, MAX_PATH, NULL, NULL);
+	if (code == 0)
+		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
+
+	m_ctm = fz_scale(percent / 100.0f, percent / 100.0f);
+
+	fz_try(m_ctx)
+	{
+		fz_page *page;
+		m_pix = NULL;
+		page = fz_load_page(m_ctx, m_doc, page_num);
+		m_pix = fz_new_pixmap_from_page(m_ctx, page, m_ctm, fz_device_rgb(m_ctx), 0);
+		fz_save_pixmap_as_png(m_ctx, m_pix, cpath);
+		//fz_save_pixmap_as_png(m_ctx, m_pix, "d:\\pixmap.png");
+	}
+	fz_catch(m_ctx)
+	{
+		MessageBox(nullptr, L"Не удалось записать .png", L"Error", MB_OK);
+		fz_drop_document(m_ctx, m_doc);
+		fz_drop_context(m_ctx);
+	}
 }

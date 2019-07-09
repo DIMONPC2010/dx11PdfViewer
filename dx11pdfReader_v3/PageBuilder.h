@@ -29,6 +29,8 @@ public:
 	void GetPrevious();
 	int NowView();
 
+	void SaveImage(float percent, std::wstring path);
+
 private:
 	std::wstring m_filename;
 	std::deque<Page> m_pageDeque;

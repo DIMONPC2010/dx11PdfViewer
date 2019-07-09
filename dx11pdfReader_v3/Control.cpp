@@ -82,8 +82,26 @@ bool Control::frame()
 	if (m_wnd->IsSearch())
 	{
 		if(m_search == nullptr)
-			m_search = std::make_shared<SearchEngine>(std::make_shared<Window>(*m_wnd->Get()), m_render);
+			m_search = std::make_shared<SearchEngine>(std::make_shared<Window>(*m_wnd.get()), m_render);
 		m_search->Run();
+	}
+
+	if (m_wnd->IsSaveImage())
+	{
+		m_wnd->SetSaveImage(false);
+		m_pages->SaveImage(m_wnd->GetPercent(), m_wnd->GetSaveFilePath());
+	}
+
+	if (m_wnd->IsOpenFile())
+	{
+		m_render = std::make_shared<Render>();
+		if (!m_render->CreateDevice(m_wnd->GetHWND()))
+		{
+			MessageBox(nullptr, L"Не удалось создать рендер", L"Error", MB_OK);
+			return false;
+		}
+		m_wnd->SetOpenFlag(false);
+		SetPages();
 	}
 
 	m_render->BeginFrame(m_wnd->GetWindowSize());

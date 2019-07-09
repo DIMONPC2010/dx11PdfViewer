@@ -192,3 +192,8 @@ int PageBuilder::NowView()
 {
 	return m_pageDeque.at(3).page_num;
 }
+
+void PageBuilder::SaveImage(float percent, std::wstring path)
+{
+	m_reader->SaveImage(m_pageDeque.at(3).page_num, percent, path);
+}
