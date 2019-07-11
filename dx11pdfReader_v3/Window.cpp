@@ -185,6 +185,10 @@ void Window::SetOpenFlag(bool aState)
 	m_open_flag = aState;
 }
 
+void Window::InitBookmarks()
+{
+}
+
 LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
 	LPFINDREPLACE fr;
@@ -265,7 +269,8 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		case FILE_OPEN:
 			m_open = new OpenDialog(this, m_dlgtitle, m_dlgfilter, m_dlgflags);
 			m_open_flag = true;
-			m_open->getOpenFileName();
+			if (!m_open->getOpenFileName())
+				exit(0);
 			return 0;
 		case FILE_SAVE_AS:
 			m_resolution = new ResolutionDialog(this, m_page_width, m_page_height);
@@ -276,10 +281,10 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 				m_save_flag = true;
 				m_save->getSaveFileName();
 			}
-			return 0;
+			break;
 		case FILE_SEARCH:
 			SendMessage(hwnd, WM_KEYDOWN, KEY_F, 0);
-			return 0;
+			break;
 		case FILE_DAY_NIGHT:
 			if (m_day_flag)
 			{
@@ -291,9 +296,9 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 				m_day_flag = true;
 				SendMessage(hwnd, WM_KEYDOWN, KEY_D, 0);
 			}
-			return 0;
+			break;
 		}
-		return 0;
+		break;
 	case WM_MOUSEMOVE: case WM_LBUTTONUP: case WM_LBUTTONDOWN: case WM_MBUTTONUP: case WM_MBUTTONDOWN: case WM_RBUTTONUP: case WM_RBUTTONDOWN: case WM_MOUSEWHEEL: case WM_KEYDOWN: case WM_KEYUP:
 		if (wParam == KEY_F)
 		{

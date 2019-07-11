@@ -63,35 +63,13 @@ Render::Render() :
 	m_pDepthStencil = nullptr;
 	m_pDepthStencilView = nullptr;
 	m_pSamplerLinear = nullptr;
+	m_pTextureWithBookmark[0] = nullptr;
+	m_pTextureWithBookmark[1] = nullptr;
 
 	for (int i = 0; i < m_pagesNum; i++)
 		m_pTextureRV[i] = nullptr;
 
-
-	m_acounters[0].cTR = -1.925f;
-	m_acounters[1].cTR = -1.65f;
-	m_acounters[2].cTR = -1.1f;
-	m_acounters[3].cTR = 0.0f;
-	m_acounters[4].cTR = 1.1f;
-	m_acounters[5].cTR = 1.65f;
-	m_acounters[6].cTR = 1.925f;
-
-	for (int i = 0; i < m_pagesNum; i++)
-		m_acounters[i].cW = 0.71f;
-
-	m_div[0] = 8;
-	m_div[1] = 4;
-	m_div[2] = 2;
-	m_div[3] = 1;
-	m_div[4] = 2;
-	m_div[5] = 4;
-	m_div[6] = 8;
-
-	for (int i = 0; i < m_pagesNum; i++)
-	{
-		m_startpos[i] = m_acounters[i];
-		m_nextpos[i] = m_acounters[i];
-	}
+	animationInit();
 }
 
 HRESULT Render::compileshaderfromfile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut)
@@ -447,8 +425,15 @@ bool Render::Draw()
 	else if (m_Doc->NowView() == m_Doc->size() - 1)
 		end = m_pagesNum - 3;
 
+
+		
 	while(worldC < end)
 	{
+		m_pTextureWithBookmark[0] = m_pTextureRV[worldC];
+		if(m_Doc->Bookmark(worldC))
+			m_pTextureWithBookmark[1] = m_pTextureFullBM;
+		else
+			m_pTextureWithBookmark[1] = m_pTextureNullBM;
 		WVP = m_World[worldC] * m_View * m_Projection;
 		cb.WVP = XMMatrixTranspose(WVP);
 		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
@@ -456,7 +441,7 @@ bool Render::Draw()
 		m_pImmediateContext->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 		m_pImmediateContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
 		m_pImmediateContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-		m_pImmediateContext->PSSetShaderResources(0, 1, m_pTextureRV[worldC].GetAddressOf());
+		m_pImmediateContext->PSSetShaderResources(0, 2, m_pTextureWithBookmark->GetAddressOf());
 		m_pImmediateContext->PSSetSamplers(0, 1, m_pSamplerLinear.GetAddressOf());
 		m_pImmediateContext->DrawIndexed(6, 0, 0);
 		worldC++;
@@ -469,11 +454,19 @@ bool Render::Draw()
 void Render::RenderDocument(PageBuilder_t pages)
 {
 	m_Doc = pages;
+	animationInit();
 
 	/*if (m_pagesNum > m_Doc->size())
 		m_pagesNum = m_Doc->size();*/
 	for (int i = 0; i < m_pagesNum; i++)
 		createStartPages(i);
+
+	HRESULT hr = CreateWICTextureFromFile(m_pd3dDevice.Get(), L"D:\\work\\Projects\\dx11pdfReader_v3\\dx11pdfReader_v3\\images\\bookmark.png", nullptr, m_pTextureFullBM.GetAddressOf());
+	if (FAILED(hr))
+		MessageBox(nullptr, L"Error", L"Не удалось создать текстуру", MB_OK);
+	hr = CreateWICTextureFromFile(m_pd3dDevice.Get(), L"D:\\work\\Projects\\dx11pdfReader_v3\\dx11pdfReader_v3\\images\\nullbookmark.png", nullptr, m_pTextureNullBM.GetAddressOf());
+	if (FAILED(hr))
+		MessageBox(nullptr, L"Error", L"Не удалось создать текстуру", MB_OK);
 
 	for (int i = 0; i < m_pagesNum; i++)
 	{
@@ -518,6 +511,7 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 		m_Doc->GetPrevious();
 		nowPage = m_nowPage - PAGE_NUM;
 	}
+
 
 	D3D11_SUBRESOURCE_DATA tbsd;
 
@@ -573,6 +567,8 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 		}
 	}
 
+	
+
 	if (FAILED(hr))
 		return hr;
 	return hr;
@@ -583,6 +579,9 @@ HRESULT Render::createStartPages(int i)
 	HRESULT hr = S_OK;
 	int bpp = 4;
 	int nb_color = 4;
+
+	if (m_Doc->Bookmark(i))
+		m_pTextureRV[PAGE_NUM] = m_pTextureWithBookmark[1];
 
 	D3D11_SUBRESOURCE_DATA tbsd;
 
@@ -622,7 +621,6 @@ HRESULT Render::createStartPages(int i)
 
 	m_acounters[i].cH = m_Doc->height(i) * m_acounters[i].cW / m_Doc->width(i);
 	m_startpos[i].cH = m_Doc->height(i) * m_startpos[i].cW / m_Doc->width(i);
-
 
 
 	if (FAILED(hr))
@@ -817,5 +815,33 @@ void Render::setStartPosValues()
 	m_startpos[4].cH = m_acounters[3].cH / 2;
 	m_startpos[5].cH = m_acounters[4].cH / 2;
 	m_startpos[6].cH = m_acounters[5].cH / 2;
+}
+
+void Render::animationInit()
+{
+	m_acounters[0].cTR = -1.925f;
+	m_acounters[1].cTR = -1.65f;
+	m_acounters[2].cTR = -1.1f;
+	m_acounters[3].cTR = 0.0f;
+	m_acounters[4].cTR = 1.1f;
+	m_acounters[5].cTR = 1.65f;
+	m_acounters[6].cTR = 1.925f;
+
+	for (int i = 0; i < m_pagesNum; i++)
+		m_acounters[i].cW = 0.71f;
+
+	m_div[0] = 8;
+	m_div[1] = 4;
+	m_div[2] = 2;
+	m_div[3] = 1;
+	m_div[4] = 2;
+	m_div[5] = 4;
+	m_div[6] = 8;
+
+	for (int i = 0; i < m_pagesNum; i++)
+	{
+		m_startpos[i] = m_acounters[i];
+		m_nextpos[i] = m_acounters[i];
+	}
 }
 

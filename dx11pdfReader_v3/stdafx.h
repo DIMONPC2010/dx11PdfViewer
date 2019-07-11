@@ -18,5 +18,6 @@
 #include <d3dcompiler.h>
 #include <directxmath.h>
 #include <directxcolors.h>
+#include "WICTextureLoader.h"
 #include <mupdf/fitz.h>
 #include <wrl.h>

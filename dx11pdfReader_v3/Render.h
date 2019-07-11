@@ -54,6 +54,7 @@ private:
 	void animCountersSetDefault();
 	void setNextPosValues();
 	void setStartPosValues();
+	void animationInit();
 
 	D3D_DRIVER_TYPE m_driverType;
 	D3D_FEATURE_LEVEL m_featureLevel;
@@ -78,6 +79,9 @@ private:
 	MWRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
 
 	MWRL::ComPtr<ID3D11ShaderResourceView> m_pTextureRV[PAGE_NUM];
+	MWRL::ComPtr<ID3D11ShaderResourceView> m_pTextureNullBM;
+	MWRL::ComPtr<ID3D11ShaderResourceView> m_pTextureFullBM;
+	MWRL::ComPtr<ID3D11ShaderResourceView> m_pTextureWithBookmark[2];
 	MWRL::ComPtr<ID3D11SamplerState> m_pSamplerLinear;
 
 	DescWindow m_winsize;

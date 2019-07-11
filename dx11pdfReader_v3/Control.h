@@ -5,6 +5,7 @@
 #include "InputMgr.h"
 #include "PageBuilder.h"
 #include "SearchEngine.h"
+#include "BookmarksIO.h"
 
 
 class Control
@@ -15,6 +16,7 @@ private:
 	typedef std::shared_ptr<InputMgr> InputMgr_t;
 	typedef std::shared_ptr<PageBuilder> PageBuilder_t;
 	typedef std::shared_ptr<SearchEngine> SearchEngine_t;
+	typedef std::shared_ptr<BookmarksIO> BookmarkIO_t;
 
 public: 
 	Control();
@@ -36,5 +38,6 @@ private:
 	InputMgr_t m_input;
 	PageBuilder_t m_pages;
 	SearchEngine_t m_search;
+	BookmarkIO_t m_bookmark;
 	bool m_init;
 };

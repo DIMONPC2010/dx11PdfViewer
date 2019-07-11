@@ -36,6 +36,7 @@ bool Control::Init()
 {
 	m_wnd = std::make_unique<Window>();
 	m_input = std::make_shared<InputMgr>();
+	m_bookmark = std::make_shared<BookmarksIO>("bookmarks.bin");
 
 	if (!m_wnd || !m_input)
 	{
@@ -58,6 +59,14 @@ bool Control::Init()
 		MessageBox(nullptr, L"Не удалось создать рендер", L"Error", MB_OK);
 		return false;
 	}
+
+	if (!m_bookmark->ReadBookmarksFromFile())
+	{
+		MessageBox(nullptr, L"Не удалось открыть закладки", L"Error", MB_OK);
+		return false;
+	}
+
+	m_wnd->InitBookmarks();
 
 	m_init = true;
 	return true;
@@ -94,18 +103,12 @@ bool Control::frame()
 
 	if (m_wnd->IsOpenFile())
 	{
-		m_render = std::make_shared<Render>();
-		if (!m_render->CreateDevice(m_wnd->GetHWND()))
-		{
-			MessageBox(nullptr, L"Не удалось создать рендер", L"Error", MB_OK);
-			return false;
-		}
 		m_wnd->SetOpenFlag(false);
 		SetPages();
 	}
 
+	m_wnd->SetPageResolution(m_pages->NowWidth(), m_pages->NowHeight());
 	m_render->BeginFrame(m_wnd->GetWindowSize());
-	m_wnd->SetPageResolution(m_pages->width(m_pages->NowView()), m_pages->height(m_pages->NowView()));
 	if (!m_render->Draw())
 		return false;
 	m_render->EndFrame();

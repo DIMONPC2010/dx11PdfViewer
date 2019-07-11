@@ -81,6 +81,8 @@ public:
 	bool IsOpenFile();
 	void SetOpenFlag(bool aState);
 
+	void InitBookmarks();
+
 	LRESULT WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 private:
 	void updateWindowState();

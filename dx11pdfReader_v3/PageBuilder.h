@@ -4,10 +4,12 @@
 
 struct Page
 {
+	Page() : bookmark(false) {};
 	unsigned char *RGB;
 	int width;
 	int height;
 	int page_num;
+	bool bookmark;
 };
 
 class PageBuilder
@@ -25,9 +27,12 @@ public:
 	int size();
 	int width(int page_num);
 	int height(int page_num);
+	int NowWidth();
+	int NowHeight();
 	void GetNext();
 	void GetPrevious();
 	int NowView();
+	bool Bookmark(int page_num);
 
 	void SaveImage(float percent, std::wstring path);
 

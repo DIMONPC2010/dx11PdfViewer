@@ -7,6 +7,7 @@ public:
 	BookmarksIO(std::string bookmarks_path);
 	bool ReadBookmarksFromFile();
 	bool WriteBookmarksToFile();
+	void AddBookmark(std::string filename, int page_num);
 
 private:
 	std::string m_bookmarks_path;

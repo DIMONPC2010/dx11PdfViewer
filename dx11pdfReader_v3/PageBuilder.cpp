@@ -139,6 +139,16 @@ int PageBuilder::height(int page_num)
 		return m_pageDeque[page_num].height;
 }
 
+int PageBuilder::NowWidth()
+{
+	return m_pageDeque[3].width;
+}
+
+int PageBuilder::NowHeight()
+{
+	return m_pageDeque[3].height;
+}
+
 void PageBuilder::GetNext()
 {
 	if (m_pageDeque.back().page_num < m_size - 1)
@@ -191,6 +201,11 @@ void PageBuilder::GetPrevious()
 int PageBuilder::NowView()
 {
 	return m_pageDeque.at(3).page_num;
+}
+
+bool PageBuilder::Bookmark(int page_num)
+{
+	return m_pageDeque[page_num].bookmark;
 }
 
 void PageBuilder::SaveImage(float percent, std::wstring path)
