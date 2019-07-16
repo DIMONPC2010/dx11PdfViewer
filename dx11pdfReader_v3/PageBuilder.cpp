@@ -208,6 +208,44 @@ bool PageBuilder::Bookmark(int page_num)
 	return m_pageDeque[page_num].bookmark;
 }
 
+void PageBuilder::SetBookmark(bool aState)
+{
+	m_pageDeque.at(3).bookmark = aState;
+}
+
+void PageBuilder::SetPageBeforeBookmark()
+{
+	m_page_before_bookmark = m_pageDeque.at(3).page_num;
+}
+
+void PageBuilder::BookmarkView(int page_num)
+{
+	if (page_num > this->NowView())
+	{
+		while (m_pageDeque.at(3).page_num != page_num)
+			GetNext();
+	}
+	else if (page_num < m_pageDeque.at(3).page_num)
+	{
+		while (m_pageDeque.at(3).page_num != page_num)
+			GetPrevious();
+	}
+}
+
+void PageBuilder::BookmarkReturn()
+{
+	if (m_page_before_bookmark > this->NowView())
+	{
+		while (m_pageDeque.at(3).page_num != m_page_before_bookmark)
+			GetNext();
+	}
+	else if (m_page_before_bookmark < this->NowView())
+	{
+		while (m_pageDeque.at(3).page_num != m_page_before_bookmark)
+			GetPrevious();
+	}
+}
+
 void PageBuilder::SaveImage(float percent, std::wstring path)
 {
 	m_reader->SaveImage(m_pageDeque.at(3).page_num, percent, path);

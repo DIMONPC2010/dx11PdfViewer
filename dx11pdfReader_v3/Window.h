@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
+#include "BookmarksIO.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
@@ -72,6 +73,7 @@ public:
 
 	DescWindow GetWindowSize();
 	std::wstring GetFilePath();
+	std::string GetStringFilePath();
 
 	bool IsSaveImage();
 	void SetSaveImage(bool aState);
@@ -81,7 +83,20 @@ public:
 	bool IsOpenFile();
 	void SetOpenFlag(bool aState);
 
-	void InitBookmarks();
+	void InitBookmarks(std::unique_ptr<BookmarksIO> bookmarks);
+	void SetNowPage(int page_num);
+	bool BookmarkWasAdd();
+	bool BookmarkWasDelete();
+	void SetBookmarkAdd(bool aState);
+	void SetBookmarkDelete(bool aState);
+	bool BookmarkWasSelected();
+	void SetBookmarkSelected(bool aState);
+	int GetSelectedPage();
+	bool GetGoToBookmark();
+	void SetGoToBookmark(bool aState);
+	bool GetMainMenuBookmark();
+
+	DescWindow GetDesc();
 
 	LRESULT WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 private:
@@ -118,6 +133,17 @@ private:
 	UINT m_uFindReplaceMsg;
 
 	bool m_day_flag;
+
+	HMENU hmenu;
+
+	std::unique_ptr<BookmarksIO> m_bookmarks;
+	int m_now_page;
+	bool m_bookmark_add;
+	bool m_bookmark_delete;
+	bool m_bookmark_was_selected;
+	int m_bookmark_selected_page;
+	bool m_goto_bookmark;
+	bool m_main_bookmark_selected;
 
 };
 

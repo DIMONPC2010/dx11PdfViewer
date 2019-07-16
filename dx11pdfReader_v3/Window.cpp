@@ -4,6 +4,8 @@
 #include "FindDialog.h"
 #include "ResolutionDialog.h"
 
+#define ID_BOOKMARK 40500
+
 Window *Window::m_wndthis = nullptr;
 
 Window::Window(void) :
@@ -18,6 +20,11 @@ Window::Window(void) :
 	,m_save_flag(false)
 	,m_open_flag(false)
 	,m_day_flag(true)
+	,m_bookmark_add(false)
+	,m_bookmark_delete(false)
+	,m_bookmark_was_selected(false)
+	,m_goto_bookmark(false)
+	,m_main_bookmark_selected(false)
 
 {
 	if (!m_wndthis)
@@ -75,8 +82,25 @@ bool Window::Create(const DescWindow &desc)
 		return false;
 	}
 
-	HMENU hmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAINMENU));
+	hmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAINMENU));
 	SetMenu(m_hwnd, hmenu);
+	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
+	{
+		HMENU subMenu = GetSubMenu(hmenu, 2);
+		std::wstring str = L"Страница ";
+		wchar_t page[64];
+		std::wstring strtowrite = L"Страница ";
+		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
+		{
+
+			swprintf_s(page, L"%d", m_bookmarks->GetBookmark(i) + 1);
+			strtowrite = str + page;
+
+			AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_bookmarks->GetBookmark(i), strtowrite.c_str());
+			SetMenu(m_hwnd, subMenu);
+			m_bookmark_add = true;
+		}
+	}
 
 
 	ShowWindow(m_hwnd, SW_SHOW);
@@ -155,6 +179,11 @@ std::wstring Window::GetFilePath()
 	return m_open->getFileName();
 }
 
+std::string Window::GetStringFilePath()
+{
+	return m_open->getFileNameString();
+}
+
 bool Window::IsSaveImage()
 {
 	return m_save_flag;
@@ -185,12 +214,76 @@ void Window::SetOpenFlag(bool aState)
 	m_open_flag = aState;
 }
 
-void Window::InitBookmarks()
+void Window::InitBookmarks(std::unique_ptr<BookmarksIO> bookmarks)
 {
+	m_bookmarks = std::move(bookmarks);
+	//m_bookmarks_exist = m_bookmarks->BookmarksExist(m_open->getFileNameString());
+}
+
+void Window::SetNowPage(int page_num)
+{
+	m_now_page = page_num;
+}
+
+bool Window::BookmarkWasAdd()
+{
+	return m_bookmark_add;
+}
+
+bool Window::BookmarkWasDelete()
+{
+	return m_bookmark_delete;
+}
+
+void Window::SetBookmarkAdd(bool aState)
+{
+	m_bookmark_add = aState;
+}
+
+void Window::SetBookmarkDelete(bool aState)
+{
+	m_bookmark_delete = aState;
+}
+
+bool Window::BookmarkWasSelected()
+{
+	return m_bookmark_was_selected;
+}
+
+void Window::SetBookmarkSelected(bool aState)
+{
+	m_bookmark_was_selected = aState;
+}
+
+int Window::GetSelectedPage()
+{
+	return m_bookmark_selected_page;
+}
+
+bool Window::GetGoToBookmark()
+{
+	return m_goto_bookmark;
+}
+
+void Window::SetGoToBookmark(bool aState)
+{
+	m_goto_bookmark = aState;
+}
+
+bool Window::GetMainMenuBookmark()
+{
+	return m_main_bookmark_selected;
+}
+
+DescWindow Window::GetDesc()
+{
+	return m_desc;
 }
 
 LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
+	//m_bookmarks->GetBookmark(m_open->getFileNameString(), i);
+
 	LPFINDREPLACE fr;
 
 	if (nMsg == m_uFindReplaceMsg)
@@ -215,6 +308,8 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		m_open = new OpenDialog(this, m_dlgtitle, m_dlgfilter, m_dlgflags);
 		if (!m_open->getOpenFileName())
 			exit(0);
+
+		
 		return 0;
 	case WM_CLOSE:
 		m_isexit = true;
@@ -297,8 +392,52 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 				SendMessage(hwnd, WM_KEYDOWN, KEY_D, 0);
 			}
 			break;
+		case BOOKMARK_ADD:
+			if (!m_bookmarks->AddBookmark(m_open->getFileNameString(), m_now_page))
+			{
+				HMENU subMenu = GetSubMenu(hmenu, 2);
+				std::wstring str = L"Страница ";
+				wchar_t page[64];
+				swprintf_s(page, L"%d", m_now_page + 1);
+				str += page;
+
+				AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_now_page, str.c_str());
+				SetMenu(hwnd, subMenu);
+				m_bookmark_add = true;
+				m_bookmarks->WriteBookmarksToFile();
+			}
+			break;
+		case BOOKMARK_DELETE:
+			if (!m_bookmarks->DeleteBookmark(m_open->getFileNameString(), m_now_page))
+			{
+				HMENU subMenu = GetSubMenu(hmenu, 2);
+				DeleteMenu(subMenu, ID_BOOKMARK + m_now_page, MF_BYCOMMAND);
+				SetMenu(hwnd, subMenu);
+				m_bookmark_delete = true;
+				m_bookmarks->WriteBookmarksToFile();
+			}
+			break;
 		}
-		break;
+		if (LOWORD(wParam) == (ID_BOOKMARK + m_bookmark_selected_page))
+			m_goto_bookmark = true;
+		return 0;
+	case WM_MENUSELECT:
+		if (LOWORD(wParam) >= ID_BOOKMARK)
+		{
+			m_bookmark_selected_page = (int)(LOWORD(wParam) - ID_BOOKMARK);
+			m_bookmark_was_selected = true;
+			//SendMessage(hwnd, WM_UNINITMENUPOPUP, (WPARAM)GetSubMenu(hmenu, 2), NULL);
+			OutputDebugStringA("m_bookmark_was_selected = true;\n");
+		}
+		return 0;
+	case WM_INITMENUPOPUP:
+		if (LOWORD(lParam) == 2)
+			m_main_bookmark_selected = true;
+		return 0;
+	case WM_UNINITMENUPOPUP:
+		if ((HMENU)wParam == GetSubMenu(hmenu, 2))
+			m_main_bookmark_selected = false;
+		return 0;
 	case WM_MOUSEMOVE: case WM_LBUTTONUP: case WM_LBUTTONDOWN: case WM_MBUTTONUP: case WM_MBUTTONDOWN: case WM_RBUTTONUP: case WM_RBUTTONDOWN: case WM_MOUSEWHEEL: case WM_KEYDOWN: case WM_KEYUP:
 		if (wParam == KEY_F)
 		{

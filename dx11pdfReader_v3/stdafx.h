@@ -6,9 +6,12 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <deque>
 #include <memory>
 #include <fstream>
+#include <thread>
+#include <mutex>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

@@ -27,3 +27,14 @@ std::wstring OpenDialog::getFileName()
 {
 	return m_szFileName;
 }
+
+std::string OpenDialog::getFileNameString()
+{
+	char filename[512];
+
+	int code = WideCharToMultiByte(CP_UTF8, 0, m_szFileName, -1, filename, MAX_PATH, NULL, NULL);
+	if (code == 0)
+		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
+	return filename;
+;
+}

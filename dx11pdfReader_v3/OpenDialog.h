@@ -8,6 +8,7 @@ public:
 	int getOpenFileName();
 	int getSaveFileName();
 	std::wstring getFileName();
+	std::string getFileNameString();
 
 private:
 	OPENFILENAME ofn;

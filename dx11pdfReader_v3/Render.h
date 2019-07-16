@@ -33,6 +33,8 @@ public:
 	void RenderDocument(PageBuilder_t pages);
 	void SetSearchPages(PageBuilder_t pages);
 	PageBuilder_t GetDocument();
+	void ViewBookmark(int page_num);
+	void ReturnFromBookmark(int start_page);
 
 	void* operator new(size_t i)
 	{
@@ -103,4 +105,7 @@ private:
 	DirectX::XMMATRIX Translation[PAGE_NUM];
 	DirectX::XMMATRIX Scale[PAGE_NUM];
 
+
+	int m_bookmark_preview;
+	int m_bookmark_startpage;
 };

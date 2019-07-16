@@ -42,11 +42,12 @@ bool Render::KeyPressed(const KeyEvent & arg)
 
 
 Render::Render() :
-  	 m_pagesNum(PAGE_NUM)
-	,m_left(false)
-	,m_right(false)
-	,m_day(true)
-	,m_night(false)
+	m_pagesNum(PAGE_NUM)
+	, m_left(false)
+	, m_right(false)
+	, m_day(true)
+	, m_night(false)
+	, m_bookmark_startpage(0)
 {
 	m_driverType = D3D_DRIVER_TYPE_NULL;
 	m_featureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -492,6 +493,33 @@ void Render::SetSearchPages(PageBuilder_t pages)
 std::shared_ptr<PageBuilder> Render::GetDocument()
 {
 	return m_Doc;
+}
+
+void Render::ViewBookmark(int page_num)
+{
+	if (page_num > m_Doc->NowView())
+	{
+		while (m_Doc->NowView() != page_num)
+		{
+			createOnePage(true, false);
+		}
+		m_Doc->SetBookmark(true);
+	}
+	else if (page_num < m_Doc->NowView())
+	{
+		while (m_Doc->NowView() != page_num)
+		{
+			createOnePage(false, true);
+		}
+		m_Doc->SetBookmark(true);
+	}
+}
+
+void Render::ReturnFromBookmark(int start_page)
+{
+	ViewBookmark(start_page);
+	m_Doc->SetBookmark(false);
+	//m_bookmark_startpage = 0;
 }
 
 HRESULT Render::createOnePage(bool push_back, bool push_front)

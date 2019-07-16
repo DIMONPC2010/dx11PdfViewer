@@ -99,9 +99,9 @@ bool BookmarksIO::WriteBookmarksToFile()
 	return true;
 }
 
-void BookmarksIO::AddBookmark(std::string filename, int page_num)
+bool BookmarksIO::AddBookmark(std::string filename, int page_num)
 {
-	Bookmarks *tmpBookMark = new Bookmarks();
+	Bookmarks *tmpBookMark = new Bookmarks(filename, 0);
 	bool exist = false;
 	std::list<Bookmarks>::iterator it = m_bookmarks.begin();
 	for (it; it != m_bookmarks.end(); ++it)
@@ -114,11 +114,9 @@ void BookmarksIO::AddBookmark(std::string filename, int page_num)
 	}
 	if (!exist)
 	{
-		int *mas = new int [1];
-		mas[0] = page_num;
-		tmpBookMark->UpdateBookmarks(filename, 1, mas);
-		delete[] mas;
+		tmpBookMark->AddNewBookmark(page_num);
 		m_bookmarks.push_back(*tmpBookMark);
+		return false;
 	}
 	else
 	{
@@ -134,7 +132,82 @@ void BookmarksIO::AddBookmark(std::string filename, int page_num)
 		if (!exist)
 		{
 			it->AddNewBookmark(page_num);
+			return false;
 		}
-
+		else
+		{
+			MessageBox(nullptr, L"Закладка уже существует", L"Info", MB_OK);
+			return true;
+		}
 	}
+}
+
+bool BookmarksIO::DeleteBookmark(std::string filename, int page_num)
+{
+	if (m_bookmarks.empty())
+	{
+		MessageBox(nullptr, L"Закладка не существует", L"Info", MB_OK);
+		return true;
+	}
+
+	bool exist = false;
+	std::list<Bookmarks>::iterator it = m_bookmarks.begin();
+	for (it; it != m_bookmarks.end(); ++it)
+	{
+		if (it->GetFilename() == filename)
+		{
+			exist = true;
+			break;
+		}
+	}
+	if (!exist)
+	{
+		MessageBox(nullptr, L"Нет закладок для файла", L"Info", MB_OK);
+		return true;
+	}
+	else
+	{
+		exist = false;
+		int index = 0;
+		for (int i = 0; i < it->GetBookmarksNumber(); i++)
+		{
+			if (it->GetBookmark(i) == page_num)
+			{
+				exist = true;
+				index = i;
+				break;
+			}
+		}
+		if (!exist)
+		{
+			MessageBox(nullptr, L"Нет закладки на открытой странице", L"Info", MB_OK);
+			return true;
+		}
+		else
+		{
+			it->DeleteBookmark(index);
+			
+			return false;
+		}
+	}
+}
+
+bool BookmarksIO::BookmarksExist(std::string filename)
+{
+	for (m_now_bookmark = m_bookmarks.begin(); m_now_bookmark != m_bookmarks.end(); ++m_now_bookmark)
+	{
+		if (m_now_bookmark->GetFilename() == filename)
+			return true;
+	}
+	return false;
+}
+
+int BookmarksIO::GetBookmark(int i)
+{
+	return m_now_bookmark->GetBookmark(i);
+}
+
+int BookmarksIO::NowBookmarksSize()
+{
+	return m_now_bookmark->GetBookmarksNumber();
 }

@@ -33,6 +33,10 @@ public:
 	void GetPrevious();
 	int NowView();
 	bool Bookmark(int page_num);
+	void SetBookmark(bool aState);
+	void SetPageBeforeBookmark();
+	void BookmarkView(int page_num);
+	void BookmarkReturn();
 
 	void SaveImage(float percent, std::wstring path);
 
@@ -40,6 +44,7 @@ private:
 	std::wstring m_filename;
 	std::deque<Page> m_pageDeque;
 	int m_size;
+	int m_page_before_bookmark;
 protected:
 	PdfReader_t m_reader;
 
