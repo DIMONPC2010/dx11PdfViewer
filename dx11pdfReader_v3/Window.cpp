@@ -84,23 +84,7 @@ bool Window::Create(const DescWindow &desc)
 
 	hmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAINMENU));
 	SetMenu(m_hwnd, hmenu);
-	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
-	{
-		HMENU subMenu = GetSubMenu(hmenu, 2);
-		std::wstring str = L"Страница ";
-		wchar_t page[64];
-		std::wstring strtowrite = L"Страница ";
-		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
-		{
-
-			swprintf_s(page, L"%d", m_bookmarks->GetBookmark(i) + 1);
-			strtowrite = str + page;
-
-			AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_bookmarks->GetBookmark(i), strtowrite.c_str());
-			SetMenu(m_hwnd, subMenu);
-			m_bookmark_add = true;
-		}
-	}
+	readbookmarks();
 
 
 	ShowWindow(m_hwnd, SW_SHOW);
@@ -217,7 +201,6 @@ void Window::SetOpenFlag(bool aState)
 void Window::InitBookmarks(std::unique_ptr<BookmarksIO> bookmarks)
 {
 	m_bookmarks = std::move(bookmarks);
-	//m_bookmarks_exist = m_bookmarks->BookmarksExist(m_open->getFileNameString());
 }
 
 void Window::SetNowPage(int page_num)
@@ -282,8 +265,6 @@ DescWindow Window::GetDesc()
 
 LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	//m_bookmarks->GetBookmark(m_open->getFileNameString(), i);
-
 	LPFINDREPLACE fr;
 
 	if (nMsg == m_uFindReplaceMsg)
@@ -362,19 +343,23 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case FILE_OPEN:
+			deletebookmarks(hwnd, GetStringFilePath());
 			m_open = new OpenDialog(this, m_dlgtitle, m_dlgfilter, m_dlgflags);
 			m_open_flag = true;
 			if (!m_open->getOpenFileName())
 				exit(0);
+			readbookmarks();
 			return 0;
 		case FILE_SAVE_AS:
 			m_resolution = new ResolutionDialog(this, m_page_width, m_page_height);
 			if (m_resolution->ButtonOKPressed())
 			{
 				m_percent_value = m_resolution->GetPercent();
-				m_save = new OpenDialog(this, L"Save page", L"PNG\0*.png", OFN_PATHMUSTEXIST);
-				m_save_flag = true;
-				m_save->getSaveFileName();
+				m_save = new OpenDialog(this, L"Save page", L"PNG Files (*.png)\0*.png\0All Files\0*\0\0", OFN_OVERWRITEPROMPT);
+				m_save->DefaultExt(L".png");
+				if(m_save->getSaveFileName())
+					m_save_flag = true;
+
 			}
 			break;
 		case FILE_SEARCH:
@@ -426,8 +411,7 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		{
 			m_bookmark_selected_page = (int)(LOWORD(wParam) - ID_BOOKMARK);
 			m_bookmark_was_selected = true;
-			//SendMessage(hwnd, WM_UNINITMENUPOPUP, (WPARAM)GetSubMenu(hmenu, 2), NULL);
-			OutputDebugStringA("m_bookmark_was_selected = true;\n");
+			//OutputDebugStringA("m_bookmark_was_selected = true;\n");
 		}
 		return 0;
 	case WM_INITMENUPOPUP:
@@ -467,6 +451,40 @@ void Window::updateWindowState()
 	ClientRect.bottom = m_desc.height;
 	if (m_inputmgr)
 		m_inputmgr->SetWinRect(ClientRect);
+}
+
+void Window::readbookmarks()
+{
+	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
+	{
+		HMENU subMenu = GetSubMenu(hmenu, 2);
+		std::wstring str = L"Страница ";
+		wchar_t page[64];
+		std::wstring strtowrite = L"Страница ";
+		m_bookmarks_id = new int[m_bookmarks->NowBookmarksSize()];
+		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
+		{
+
+			swprintf_s(page, L"%d", m_bookmarks->GetBookmark(i) + 1);
+			strtowrite = str + page;
+
+			AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_bookmarks->GetBookmark(i), strtowrite.c_str());
+			m_bookmarks_id[i] = ID_BOOKMARK + m_bookmarks->GetBookmark(i);
+			SetMenu(m_hwnd, subMenu);
+			m_bookmark_add = true;
+		}
+	}
+}
+
+void Window::deletebookmarks(HWND hwnd, std::string filename)
+{
+	HMENU subMenu = GetSubMenu(hmenu, 2);
+	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
+	{
+		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
+			DeleteMenu(subMenu, m_bookmarks_id[i], MF_BYCOMMAND);
+	}
+	SetMenu(hwnd, subMenu);
 }
 
 LRESULT CALLBACK StaticWndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)

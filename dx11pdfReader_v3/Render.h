@@ -57,6 +57,7 @@ private:
 	void setNextPosValues();
 	void setStartPosValues();
 	void animationInit();
+	void setupRenderCounters(int *worldC, int *end);
 
 	D3D_DRIVER_TYPE m_driverType;
 	D3D_FEATURE_LEVEL m_featureLevel;

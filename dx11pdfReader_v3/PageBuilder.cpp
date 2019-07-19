@@ -23,21 +23,37 @@ void PageBuilder::GetStartPages()
 	m_pageDeque.push_front(p);
 
 	int page_num = 0;
-	if (m_reader->GetDocumentSize() < PAGE_NUM)
-		page_num = m_reader->GetDocumentSize();
-	else
-		page_num = PAGE_NUM;
-
-
-	for (int i = 0; i < page_num - 3; i++)
+	page_num = PAGE_NUM - 3;
+	if (m_reader->GetDocumentSize() < page_num)
 	{
-		if (m_reader->ReadPdfDocument(m_filename, i))
+		for (int i = 0; i < m_reader->GetDocumentSize(); i++)
 		{
-			p.RGB = m_reader->GetUNORMPage();
-			p.width = m_reader->width();
-			p.height = m_reader->height();
-			p.page_num = i;
+			if (m_reader->ReadPdfDocument(m_filename, i))
+			{
+				p.RGB = m_reader->GetUNORMPage();
+				p.width = m_reader->width();
+				p.height = m_reader->height();
+				p.page_num = i;
+				m_pageDeque.push_back(p);
+			}
+		}
+
+		for(int i = m_reader->GetDocumentSize(); i < page_num; i++)
 			m_pageDeque.push_back(p);
+	
+	}
+	else
+	{
+		for (int i = 0; i < page_num; i++)
+		{
+			if (m_reader->ReadPdfDocument(m_filename, i))
+			{
+				p.RGB = m_reader->GetUNORMPage();
+				p.width = m_reader->width();
+				p.height = m_reader->height();
+				p.page_num = i;
+				m_pageDeque.push_back(p);
+			}
 		}
 	}
 }

@@ -36,5 +36,9 @@ std::string OpenDialog::getFileNameString()
 	if (code == 0)
 		MessageBox(nullptr, L"Не удалось конвертировать в utf-8", L"Error", MB_OK);
 	return filename;
-;
+}
+
+void OpenDialog::DefaultExt(wchar_t * ext)
+{
+	ofn.lpstrDefExt = ext;
 }

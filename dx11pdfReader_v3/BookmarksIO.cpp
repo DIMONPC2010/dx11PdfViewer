@@ -70,7 +70,7 @@ bool BookmarksIO::ReadBookmarksFromFile()
 
 bool BookmarksIO::WriteBookmarksToFile()
 {
-	std::ofstream data(m_bookmarks_path.c_str(), std::ios::binary | std::ios::out);
+	std::ofstream data(m_bookmarks_path.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
 	if (!data)
 	{
 		MessageBox(nullptr, L"Не удалось записать закладки.", L"Error", MB_OK);

@@ -405,49 +405,57 @@ bool Render::Draw()
 	if(m_night)
 		cb.vInversion = 1.0f;
 	
+	int worldC, end;
 
-	int end = m_pagesNum - 1;
-	if (m_right)
-		end = m_pagesNum;
+	setupRenderCounters(&worldC, &end);
 
-	int worldC = 1;
 	if (m_left)
-		worldC = 0;
-	if (m_Doc->NowView() == 0)
-		worldC = 3;
-	else if (m_Doc->NowView() == 1)
-		worldC = 2;
-	else if (m_Doc->NowView() == 2)
-		worldC = 1;
-	else if (m_Doc->NowView() == m_Doc->size() - 3)
-		end = m_pagesNum - 1;
-	else if (m_Doc->NowView() == m_Doc->size() - 2)
-		end = m_pagesNum - 2;
-	else if (m_Doc->NowView() == m_Doc->size() - 1)
-		end = m_pagesNum - 3;
-
-
-		
-	while(worldC < end)
 	{
-		m_pTextureWithBookmark[0] = m_pTextureRV[worldC];
-		if(m_Doc->Bookmark(worldC))
-			m_pTextureWithBookmark[1] = m_pTextureFullBM;
-		else
-			m_pTextureWithBookmark[1] = m_pTextureNullBM;
-		WVP = m_World[worldC] * m_View * m_Projection;
-		cb.WVP = XMMatrixTranspose(WVP);
-		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
-		m_pImmediateContext->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
-		m_pImmediateContext->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-		m_pImmediateContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
-		m_pImmediateContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-		m_pImmediateContext->PSSetShaderResources(0, 2, m_pTextureWithBookmark->GetAddressOf());
-		m_pImmediateContext->PSSetSamplers(0, 1, m_pSamplerLinear.GetAddressOf());
-		m_pImmediateContext->DrawIndexed(6, 0, 0);
-		worldC++;
+		int tmp = worldC;
+		worldC = end - 1;
+		end = tmp - 1;
+		while (worldC > end)
+		{
+			m_pTextureWithBookmark[0] = m_pTextureRV[worldC];
+			if (m_Doc->Bookmark(worldC))
+				m_pTextureWithBookmark[1] = m_pTextureFullBM;
+			else
+				m_pTextureWithBookmark[1] = m_pTextureNullBM;
+			WVP = m_World[worldC] * m_View * m_Projection;
+			cb.WVP = XMMatrixTranspose(WVP);
+			m_pImmediateContext->UpdateSubresource(m_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
+			m_pImmediateContext->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
+			m_pImmediateContext->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			m_pImmediateContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
+			m_pImmediateContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			m_pImmediateContext->PSSetShaderResources(0, 2, m_pTextureWithBookmark->GetAddressOf());
+			m_pImmediateContext->PSSetSamplers(0, 1, m_pSamplerLinear.GetAddressOf());
+			m_pImmediateContext->DrawIndexed(6, 0, 0);
+			worldC--;
+		}
 	}
-
+	else
+	{
+		while (worldC < end)
+		{
+			m_pTextureWithBookmark[0] = m_pTextureRV[worldC];
+			if (m_Doc->Bookmark(worldC))
+				m_pTextureWithBookmark[1] = m_pTextureFullBM;
+			else
+				m_pTextureWithBookmark[1] = m_pTextureNullBM;
+			WVP = m_World[worldC] * m_View * m_Projection;
+			cb.WVP = XMMatrixTranspose(WVP);
+			m_pImmediateContext->UpdateSubresource(m_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
+			m_pImmediateContext->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
+			m_pImmediateContext->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			m_pImmediateContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
+			m_pImmediateContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			m_pImmediateContext->PSSetShaderResources(0, 2, m_pTextureWithBookmark->GetAddressOf());
+			m_pImmediateContext->PSSetSamplers(0, 1, m_pSamplerLinear.GetAddressOf());
+			m_pImmediateContext->DrawIndexed(6, 0, 0);
+			worldC++;
+		}
+	}
 	return true;
 }
 
@@ -455,10 +463,10 @@ bool Render::Draw()
 void Render::RenderDocument(PageBuilder_t pages)
 {
 	m_Doc = pages;
+	m_left = false;
+	m_right = false;
 	animationInit();
 
-	/*if (m_pagesNum > m_Doc->size())
-		m_pagesNum = m_Doc->size();*/
 	for (int i = 0; i < m_pagesNum; i++)
 		createStartPages(i);
 
@@ -579,8 +587,6 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 			m_nextpos[m_pagesNum - 1].cH = m_Doc->height(nowPage) * m_nextpos[m_pagesNum - 1].cW / m_Doc->width(nowPage);
 			m_pImmediateContext->UpdateSubresource(tex.Get(), 0, 0, tbsd.pSysMem, tbsd.SysMemPitch, 0);
 			m_pImmediateContext->GenerateMips(m_pTextureRV[m_pagesNum - 1].Get());
-			//m_Doc->GetNext();
-			//m_nowPage++;
 		}
 		if (push_front == true)
 		{
@@ -590,8 +596,6 @@ HRESULT Render::createOnePage(bool push_back, bool push_front)
 			m_startpos[0].cH = m_Doc->height(nowPage) * m_startpos[0].cW / m_Doc->width(nowPage);
 			m_pImmediateContext->UpdateSubresource(tex.Get(), 0, 0, tbsd.pSysMem, tbsd.SysMemPitch, 0);
 			m_pImmediateContext->GenerateMips(m_pTextureRV[0].Get());
-			//m_Doc->GetPrevious();
-			//m_nowPage--;
 		}
 	}
 
@@ -873,3 +877,38 @@ void Render::animationInit()
 	}
 }
 
+void Render::setupRenderCounters(int * worldC, int * end)
+{
+	*end = m_pagesNum - 1;
+	if (m_right)
+		*end = m_pagesNum;
+
+	*worldC = 1;
+	if (m_left)
+		*worldC = 0;
+
+	if (m_Doc->NowView() == 0)
+		*worldC = 3;
+	else if (m_Doc->NowView() == 1)
+		*worldC = 2;
+	else if (m_Doc->NowView() == 2)
+		*worldC = 1;
+	else if (m_Doc->NowView() == m_Doc->size() - 3)
+		*end = m_pagesNum - 1;
+	else if (m_Doc->NowView() == m_Doc->size() - 2)
+		*end = m_pagesNum - 2;
+	else if (m_Doc->NowView() == m_Doc->size() - 1)
+		*end = m_pagesNum - 3;
+
+	if (m_Doc->size() == 4 && m_Doc->NowView() == 0 && m_right == false)
+		*end = m_Doc->size() + 2;
+	else if (m_Doc->size() == 4 && m_Doc->NowView() == m_Doc->size() - 1)
+		*end = m_Doc->size();
+
+	else if (m_Doc->size() == 5 && m_Doc->NowView() == m_Doc->size() - 3 && m_right == true)
+		*end = m_pagesNum - 1;
+
+
+	else if (m_Doc->size() < PAGE_NUM - 2)
+		*end = m_Doc->size() + *worldC;
+}

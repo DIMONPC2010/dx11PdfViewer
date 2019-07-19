@@ -15,16 +15,10 @@ Control::~Control()
 
 void Control::SetPages()
 {
+	m_render_lock.lock();
 	m_pages = std::make_shared<PageBuilder>(m_wnd->GetFilePath());
-	/*if (m_bookmark->BookmarksExist(m_wnd->GetStringFilePath()))
-	{
-		m_pages->Bookmark
-	}*/
 	m_render->RenderDocument(m_pages);	
-	
-
-
-	//m_render->SetSearchPages(m_pages);
+	m_render_lock.unlock();
 }
 
 void Control::AddInputListener(InputListener *listener)
@@ -44,7 +38,6 @@ bool Control::Init()
 	m_wnd = std::make_unique<Window>();
 	m_input = std::make_shared<InputMgr>();
 	m_bookmark = std::make_unique<BookmarksIO>("D:\\work\\Projects\\dx11pdfReader_v3\\dx11pdfReader_v3\\bookmarks.bin");
-	m_bookmark->ReadBookmarksFromFile();
 
 	if (!m_bookmark->ReadBookmarksFromFile())
 	{
@@ -106,9 +99,13 @@ bool Control::frame()
 
 	if (m_wnd->IsSearch())
 	{
-		if(m_search == nullptr)
+		m_render_lock.lock();
+		if (m_search == nullptr)
+		{
 			m_search = std::make_shared<SearchEngine>(m_wnd, m_render);
+		}
 		m_search->Run();
+		m_render_lock.unlock();
 	}
 
 	if (m_wnd->IsSaveImage())
@@ -122,7 +119,7 @@ bool Control::frame()
 		m_wnd->SetOpenFlag(false);
 		SetPages();
 	}
-
+	m_render_lock.lock();
 	if (m_wnd->BookmarkWasAdd())
 	{
 		m_pages->SetBookmark(true);
@@ -134,6 +131,7 @@ bool Control::frame()
 		m_pages->SetBookmark(false);
 		m_wnd->SetBookmarkDelete(false);
 	}
+	m_render_lock.unlock();
 
 	m_wnd->SetPageResolution(m_pages->NowWidth(), m_pages->NowHeight());
 	m_wnd->SetNowPage(m_pages->NowView());
@@ -150,14 +148,16 @@ void Control::render_frame(bool & start_render, bool & end_render, DescWindow & 
 	int start_page = 0;
 	while (!end_render)
 	{
+		m_render_lock.lock();
 		if (start_render)
 		{
 			m_render->BeginFrame(desc);
 			m_render->Draw();
 			m_render->EndFrame();
+
+			
 			if (m_wnd->BookmarkWasSelected())
 			{
-				//m_wnd->SetBookmarkSelected(false);
 				int bookmark_page = m_wnd->GetSelectedPage();
 				m_render->ViewBookmark(bookmark_page);
 			}
@@ -180,7 +180,8 @@ void Control::render_frame(bool & start_render, bool & end_render, DescWindow & 
 				m_render->ViewBookmark(bookmark_page);
 			}
 		}
-		Sleep(1);
+		m_render_lock.unlock();
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
 }
 

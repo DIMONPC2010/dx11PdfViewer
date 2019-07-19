@@ -21,11 +21,6 @@ BOOL ResolutionDialog::ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wPar
 		hwndEditWidth = GetDlgItem(hwndDlg, IDC_EDIT_WIDTH);
 		hwndEditPercent = GetDlgItem(hwndDlg, IDC_EDIT_PERCENT);
 		updateDlgWindowText();
-		return FALSE;
-	case WM_CLOSE:
-		m_dialog_ok = false;
-		m_wndthis = nullptr;
-		EndDialog(hwndDlg, 0);
 		return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -33,12 +28,12 @@ BOOL ResolutionDialog::ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wPar
 		case IDOK:
 			m_dialog_ok = true;
 			m_wndthis = nullptr;
-			EndDialog(hwndDlg, 0);
+			EndDialog(hwndDlg, LOWORD(wParam));
 			return TRUE;
 		case IDCANCEL:
 			m_dialog_ok = false;
 			m_wndthis = nullptr;
-			EndDialog(hwndDlg, 0);
+			EndDialog(hwndDlg, LOWORD(wParam));
 			return TRUE;
 		case IDC_EDIT_HEIGHT:
 			if (HIWORD(wParam) == EN_UPDATE && m_text_changed == false)

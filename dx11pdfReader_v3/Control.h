@@ -44,6 +44,7 @@ private:
 	bool m_init;
 
 	std::thread *m_render_thread;
+	std::mutex m_render_lock;
 	bool m_start_render;
 	bool m_end_render;
 	DescWindow m_desc;

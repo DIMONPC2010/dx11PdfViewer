@@ -16,6 +16,7 @@ SearchEngine::SearchEngine(Window_t wnd, Render_t render) :
 
 void SearchEngine::Run()
 {
+	searchstr = m_wnd->SearchString();
 	InitFlags();
 	if (m_wnd->GetFindDlgFlagDown() == false)
 	{

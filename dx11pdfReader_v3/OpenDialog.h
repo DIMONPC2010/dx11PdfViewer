@@ -9,6 +9,7 @@ public:
 	int getSaveFileName();
 	std::wstring getFileName();
 	std::string getFileNameString();
+	void DefaultExt(wchar_t *ext);
 
 private:
 	OPENFILENAME ofn;

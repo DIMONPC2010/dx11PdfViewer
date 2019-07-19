@@ -102,6 +102,8 @@ public:
 private:
 	void updateWindowState();
 	void winsearch();
+	void readbookmarks();
+	void deletebookmarks(HWND hwnd, std::string filename);
 
 	static Window *m_wndthis;
 
@@ -144,6 +146,7 @@ private:
 	int m_bookmark_selected_page;
 	bool m_goto_bookmark;
 	bool m_main_bookmark_selected;
+	int *m_bookmarks_id;
 
 };
 
