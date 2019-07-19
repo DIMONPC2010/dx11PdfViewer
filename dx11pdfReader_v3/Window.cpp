@@ -20,8 +20,6 @@ Window::Window(void) :
 	,m_save_flag(false)
 	,m_open_flag(false)
 	,m_day_flag(true)
-	,m_bookmark_add(false)
-	,m_bookmark_delete(false)
 	,m_bookmark_was_selected(false)
 	,m_goto_bookmark(false)
 	,m_main_bookmark_selected(false)
@@ -84,7 +82,9 @@ bool Window::Create(const DescWindow &desc)
 
 	hmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAINMENU));
 	SetMenu(m_hwnd, hmenu);
+
 	readbookmarks();
+	SetBookmarksUpdate(true);
 
 
 	ShowWindow(m_hwnd, SW_SHOW);
@@ -208,26 +208,6 @@ void Window::SetNowPage(int page_num)
 	m_now_page = page_num;
 }
 
-bool Window::BookmarkWasAdd()
-{
-	return m_bookmark_add;
-}
-
-bool Window::BookmarkWasDelete()
-{
-	return m_bookmark_delete;
-}
-
-void Window::SetBookmarkAdd(bool aState)
-{
-	m_bookmark_add = aState;
-}
-
-void Window::SetBookmarkDelete(bool aState)
-{
-	m_bookmark_delete = aState;
-}
-
 bool Window::BookmarkWasSelected()
 {
 	return m_bookmark_was_selected;
@@ -256,6 +236,30 @@ void Window::SetGoToBookmark(bool aState)
 bool Window::GetMainMenuBookmark()
 {
 	return m_main_bookmark_selected;
+}
+
+bool Window::GetBookmarksUpdate()
+{
+	return m_bookmarks_update;
+}
+
+void Window::SetBookmarksUpdate(bool aState)
+{
+	m_bookmarks_update = aState;
+}
+
+std::unique_ptr<Bookmarks> Window::GetBookmarksForDocument()
+{
+	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
+	{
+		std::unique_ptr<Bookmarks> tmp = std::make_unique<Bookmarks>(m_bookmarks->GetBookmarks());
+		return tmp;
+	}
+	else
+	{
+		std::unique_ptr<Bookmarks> tmp = std::make_unique<Bookmarks>(GetStringFilePath(), 0);
+		return tmp;
+	}
 }
 
 DescWindow Window::GetDesc()
@@ -349,6 +353,7 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 			if (!m_open->getOpenFileName())
 				exit(0);
 			readbookmarks();
+			SetBookmarksUpdate(true);
 			return 0;
 		case FILE_SAVE_AS:
 			m_resolution = new ResolutionDialog(this, m_page_width, m_page_height);
@@ -387,9 +392,10 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 				str += page;
 
 				AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_now_page, str.c_str());
+				m_bookmarks_id.push_back(ID_BOOKMARK + m_now_page);
 				SetMenu(hwnd, subMenu);
-				m_bookmark_add = true;
 				m_bookmarks->WriteBookmarksToFile();
+				SetBookmarksUpdate(true);
 			}
 			break;
 		case BOOKMARK_DELETE:
@@ -397,9 +403,14 @@ LRESULT Window::WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 			{
 				HMENU subMenu = GetSubMenu(hmenu, 2);
 				DeleteMenu(subMenu, ID_BOOKMARK + m_now_page, MF_BYCOMMAND);
+
+				std::list<int>::iterator it;
+				for (it = m_bookmarks_id.begin(); *it != ID_BOOKMARK + m_now_page; ++it);
+				m_bookmarks_id.erase(it);
+
 				SetMenu(hwnd, subMenu);
-				m_bookmark_delete = true;
 				m_bookmarks->WriteBookmarksToFile();
+				SetBookmarksUpdate(true);
 			}
 			break;
 		}
@@ -461,7 +472,6 @@ void Window::readbookmarks()
 		std::wstring str = L"Страница ";
 		wchar_t page[64];
 		std::wstring strtowrite = L"Страница ";
-		m_bookmarks_id = new int[m_bookmarks->NowBookmarksSize()];
 		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
 		{
 
@@ -469,9 +479,8 @@ void Window::readbookmarks()
 			strtowrite = str + page;
 
 			AppendMenu(subMenu, MF_STRING, ID_BOOKMARK + m_bookmarks->GetBookmark(i), strtowrite.c_str());
-			m_bookmarks_id[i] = ID_BOOKMARK + m_bookmarks->GetBookmark(i);
+			m_bookmarks_id.push_back( ID_BOOKMARK + m_bookmarks->GetBookmark(i));
 			SetMenu(m_hwnd, subMenu);
-			m_bookmark_add = true;
 		}
 	}
 }
@@ -481,9 +490,10 @@ void Window::deletebookmarks(HWND hwnd, std::string filename)
 	HMENU subMenu = GetSubMenu(hmenu, 2);
 	if (m_bookmarks->BookmarksExist(GetStringFilePath()))
 	{
-		for (int i = 0; i < m_bookmarks->NowBookmarksSize(); i++)
-			DeleteMenu(subMenu, m_bookmarks_id[i], MF_BYCOMMAND);
+		for (std::list<int>::iterator it = m_bookmarks_id.begin(); it != m_bookmarks_id.end(); ++it)
+			DeleteMenu(subMenu, *it, MF_BYCOMMAND);
 	}
+	m_bookmarks_id.clear();
 	SetMenu(hwnd, subMenu);
 }
 

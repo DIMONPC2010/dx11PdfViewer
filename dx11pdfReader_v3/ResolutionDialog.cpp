@@ -11,6 +11,11 @@ ResolutionDialog::ResolutionDialog(Window * wind, int width, int height) : Dialo
 	DialogBox(NULL, L"IDD_RESOLUTION_DIALOG", this->GetHWND(), ResolutionDlgProc);
 }
 
+ResolutionDialog::~ResolutionDialog()
+{
+	m_wndthis = nullptr;
+}
+
 BOOL ResolutionDialog::ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
 	int new_resolution = 0;

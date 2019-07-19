@@ -119,17 +119,13 @@ bool Control::frame()
 		m_wnd->SetOpenFlag(false);
 		SetPages();
 	}
-	m_render_lock.lock();
-	if (m_wnd->BookmarkWasAdd())
-	{
-		m_pages->SetBookmark(true);
-		m_wnd->SetBookmarkAdd(false);
-	}
 
-	if (m_wnd->BookmarkWasDelete())
+	m_render_lock.lock();
+	if (m_wnd->GetBookmarksUpdate())
 	{
-		m_pages->SetBookmark(false);
-		m_wnd->SetBookmarkDelete(false);
+		m_wnd->SetBookmarksUpdate(false);
+		m_pages->UpdateBookmarks(m_wnd->GetBookmarksForDocument());
+		//m_render->RenderDocument(m_pages);
 	}
 	m_render_lock.unlock();
 

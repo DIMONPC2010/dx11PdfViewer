@@ -8,6 +8,7 @@ public:
 	static ResolutionDialog* Get() { return m_wndthis; }
 
 	ResolutionDialog(Window *wind, int width, int height);
+	~ResolutionDialog();
 	BOOL ResolutionDialogProc(HWND hwndDlg, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	float GetPercent();
 	bool ButtonOKPressed();

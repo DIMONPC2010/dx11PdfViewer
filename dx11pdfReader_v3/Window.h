@@ -85,23 +85,21 @@ public:
 
 	void InitBookmarks(std::unique_ptr<BookmarksIO> bookmarks);
 	void SetNowPage(int page_num);
-	bool BookmarkWasAdd();
-	bool BookmarkWasDelete();
-	void SetBookmarkAdd(bool aState);
-	void SetBookmarkDelete(bool aState);
 	bool BookmarkWasSelected();
 	void SetBookmarkSelected(bool aState);
 	int GetSelectedPage();
 	bool GetGoToBookmark();
 	void SetGoToBookmark(bool aState);
 	bool GetMainMenuBookmark();
+	bool GetBookmarksUpdate();
+	void SetBookmarksUpdate(bool aState);
+	std::unique_ptr<Bookmarks> GetBookmarksForDocument();
 
 	DescWindow GetDesc();
 
 	LRESULT WndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 private:
 	void updateWindowState();
-	void winsearch();
 	void readbookmarks();
 	void deletebookmarks(HWND hwnd, std::string filename);
 
@@ -130,7 +128,6 @@ private:
 	FindDialog *m_find;
 	ResolutionDialog *m_resolution;
 	int m_page_width, m_page_height;
-	//wchar_t *wfilepath;
 	HWND m_dlghwnd;
 	UINT m_uFindReplaceMsg;
 
@@ -140,13 +137,12 @@ private:
 
 	std::unique_ptr<BookmarksIO> m_bookmarks;
 	int m_now_page;
-	bool m_bookmark_add;
-	bool m_bookmark_delete;
 	bool m_bookmark_was_selected;
 	int m_bookmark_selected_page;
 	bool m_goto_bookmark;
 	bool m_main_bookmark_selected;
-	int *m_bookmarks_id;
+	bool m_bookmarks_update;
+	std::list<int> m_bookmarks_id;
 
 };
 

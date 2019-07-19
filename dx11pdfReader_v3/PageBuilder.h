@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "PdfReader.h"
+#include "Bookmarks.h"
 
 struct Page
 {
@@ -34,9 +35,8 @@ public:
 	int NowView();
 	bool Bookmark(int page_num);
 	void SetBookmark(bool aState);
-	void SetPageBeforeBookmark();
-	void BookmarkView(int page_num);
-	void BookmarkReturn();
+	void SetupBookmark();
+	void UpdateBookmarks(std::unique_ptr<Bookmarks> bookmarks);
 
 	void SaveImage(float percent, std::wstring path);
 
@@ -44,7 +44,7 @@ private:
 	std::wstring m_filename;
 	std::deque<Page> m_pageDeque;
 	int m_size;
-	int m_page_before_bookmark;
+	std::unique_ptr<Bookmarks> m_bookmarks;
 protected:
 	PdfReader_t m_reader;
 

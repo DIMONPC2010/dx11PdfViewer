@@ -526,7 +526,7 @@ void Render::ViewBookmark(int page_num)
 void Render::ReturnFromBookmark(int start_page)
 {
 	ViewBookmark(start_page);
-	m_Doc->SetBookmark(false);
+	//m_Doc->SetBookmark(false);
 	//m_bookmark_startpage = 0;
 }
 
@@ -691,46 +691,48 @@ std::wstring Render::getModuleShaderName()
 
 bool Render::animationRight()
 {
-		m_acounters[1].cTR -= 0.001f;
+	float animationStep = 0.001f;
+
+		m_acounters[1].cTR -= animationStep;
 	if (m_acounters[1].cW > m_nextpos[0].cW)
-		m_acounters[1].cW -= 0.001f;
+		m_acounters[1].cW -= animationStep;
 	if (m_acounters[1].cH > m_nextpos[0].cH)
-		m_acounters[1].cH -= 0.001f;
+		m_acounters[1].cH -= animationStep;
 
 	if (m_acounters[2].cTR > m_nextpos[1].cTR)
-		m_acounters[2].cTR -= 0.001f;
+		m_acounters[2].cTR -= animationStep;
 	if (m_acounters[2].cW > m_nextpos[1].cW)
-		m_acounters[2].cW -= 0.001f;
+		m_acounters[2].cW -= animationStep;
 	if (m_acounters[2].cH > m_nextpos[1].cH)
-		m_acounters[2].cH -= 0.001f;
+		m_acounters[2].cH -= animationStep;
 
 	if (m_acounters[3].cTR > m_nextpos[2].cTR)
-		m_acounters[3].cTR -= 0.001f;
+		m_acounters[3].cTR -= animationStep;
 	if (m_acounters[3].cW > m_nextpos[2].cW)
-		m_acounters[3].cW -= 0.001f;
+		m_acounters[3].cW -= animationStep;
 	if (m_acounters[3].cH > m_nextpos[2].cH)
-		m_acounters[3].cH -= 0.001f;
+		m_acounters[3].cH -= animationStep;
 
 	if (m_acounters[4].cTR > m_nextpos[3].cTR)
-		m_acounters[4].cTR -= 0.001f;
+		m_acounters[4].cTR -= animationStep;
 	if (m_acounters[4].cW < m_nextpos[3].cW)
-		m_acounters[4].cW += 0.001f;
+		m_acounters[4].cW += animationStep;
 	if (m_acounters[4].cH < m_nextpos[3].cH)
-		m_acounters[4].cH += 0.001f;
+		m_acounters[4].cH += animationStep;
 
 	if (m_acounters[5].cTR > m_nextpos[4].cTR)
-		m_acounters[5].cTR -= 0.001f;
+		m_acounters[5].cTR -= animationStep;
 	if (m_acounters[5].cW < m_nextpos[4].cW)
-		m_acounters[5].cW += 0.001f;
+		m_acounters[5].cW += animationStep;
 	if (m_acounters[5].cH < m_nextpos[4].cH)
-		m_acounters[5].cH += 0.001f;
+		m_acounters[5].cH += animationStep;
 
 	if (m_acounters[6].cTR > m_nextpos[5].cTR)
-		m_acounters[6].cTR -= 0.001f;
+		m_acounters[6].cTR -= animationStep;
 	if (m_acounters[6].cW < m_nextpos[5].cW)
-		m_acounters[6].cW += 0.001f;
+		m_acounters[6].cW += animationStep;
 	if (m_acounters[6].cH < m_nextpos[5].cH)
-		m_acounters[6].cH += 0.001f;
+		m_acounters[6].cH += animationStep;
 
 	if (m_acounters[4].cTR > m_nextpos[3].cTR)
 		return false;
@@ -740,47 +742,49 @@ bool Render::animationRight()
 
 bool Render::animationLeft()
 {
+	float animationStep = 0.001f;
+
 	if (m_acounters[0].cTR < m_startpos[1].cTR)
-		m_acounters[0].cTR += 0.001f;
+		m_acounters[0].cTR += animationStep;
 	if (m_acounters[0].cW < m_startpos[1].cW)
-		m_acounters[0].cW += 0.001f;
+		m_acounters[0].cW += animationStep;
 	if (m_acounters[0].cH < m_startpos[1].cH)
-		m_acounters[0].cH += 0.001f;
+		m_acounters[0].cH += animationStep;
 
 	if (m_acounters[1].cTR < m_startpos[2].cTR)
-		m_acounters[1].cTR += 0.001f;
+		m_acounters[1].cTR += animationStep;
 	if (m_acounters[1].cW < m_startpos[2].cW)
-		m_acounters[1].cW += 0.001f;
+		m_acounters[1].cW += animationStep;
 	if (m_acounters[1].cH < m_startpos[2].cH)
-		m_acounters[1].cH += 0.001f;
+		m_acounters[1].cH += animationStep;
 
 	if (m_acounters[2].cTR < m_startpos[3].cTR)
-		m_acounters[2].cTR += 0.001f;
+		m_acounters[2].cTR += animationStep;
 	if (m_acounters[2].cW < m_startpos[3].cW)
-		m_acounters[2].cW += 0.001f;
+		m_acounters[2].cW += animationStep;
 	if (m_acounters[2].cH < m_startpos[3].cH)
-		m_acounters[2].cH += 0.001f;
+		m_acounters[2].cH += animationStep;
 
 	if (m_acounters[3].cTR < m_startpos[4].cTR)
-		m_acounters[3].cTR += 0.001f;
+		m_acounters[3].cTR += animationStep;
 	if (m_acounters[3].cW > m_startpos[4].cW)
-		m_acounters[3].cW -= 0.001f;
+		m_acounters[3].cW -= animationStep;
 	if (m_acounters[3].cH > m_startpos[4].cH)
-		m_acounters[3].cH -= 0.001f;
+		m_acounters[3].cH -= animationStep;
 
 	if (m_acounters[4].cTR < m_startpos[5].cTR)
-		m_acounters[4].cTR += 0.001f;
+		m_acounters[4].cTR += animationStep;
 	if (m_acounters[4].cW > m_startpos[5].cW)
-		m_acounters[4].cW -= 0.001f;
+		m_acounters[4].cW -= animationStep;
 	if (m_acounters[4].cH > m_startpos[5].cH)
-		m_acounters[4].cH -= 0.001f;
+		m_acounters[4].cH -= animationStep;
 
 	//if (m_acounters[5].cTR < m_startpos[6].cTR)
-		m_acounters[5].cTR += 0.001f;
+		m_acounters[5].cTR += animationStep;
 	if (m_acounters[5].cW < m_startpos[6].cW)
-		m_acounters[5].cW += 0.001f;
+		m_acounters[5].cW += animationStep;
 	if (m_acounters[5].cH < m_startpos[6].cH)
-		m_acounters[5].cH += 0.001f;
+		m_acounters[5].cH += animationStep;
 
 
 

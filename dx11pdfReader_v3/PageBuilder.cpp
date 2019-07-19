@@ -4,6 +4,7 @@ PageBuilder::PageBuilder(std::wstring filename)
 {
 	m_reader = std::make_shared<PdfReader>();
 	m_filename = filename;
+	m_bookmarks = std::make_unique<Bookmarks>();
 	if (m_reader->ReadPdfDocument(filename, 0))
 	{
 		m_size = m_reader->GetDocumentSize();
@@ -188,6 +189,7 @@ void PageBuilder::GetNext()
 		m_pageDeque.pop_front();
 		m_pageDeque.push_back(m_pageDeque.back());
 	}
+	SetupBookmark();
 }
 
 void PageBuilder::GetPrevious()
@@ -212,6 +214,7 @@ void PageBuilder::GetPrevious()
 			m_pageDeque.push_front(p);
 		}
 	}
+	SetupBookmark();
 }
 
 int PageBuilder::NowView()
@@ -229,37 +232,34 @@ void PageBuilder::SetBookmark(bool aState)
 	m_pageDeque.at(3).bookmark = aState;
 }
 
-void PageBuilder::SetPageBeforeBookmark()
+void PageBuilder::SetupBookmark()
 {
-	m_page_before_bookmark = m_pageDeque.at(3).page_num;
+	bool exist = false;
+	for (int i = 0; i < m_pageDeque.size(); i++)
+	{
+		for (int j = 0; j < m_bookmarks->GetBookmarksNumber(); j++)
+		{
+			if (m_pageDeque.at(i).page_num == m_bookmarks->GetBookmark(j))
+			{
+				m_pageDeque.at(i).bookmark = true;
+				exist = true;
+			}
+		}
+		if (exist)
+		{
+			exist = false;
+		}
+		else
+		{
+			m_pageDeque.at(i).bookmark = false;
+		}
+	}
 }
 
-void PageBuilder::BookmarkView(int page_num)
+void PageBuilder::UpdateBookmarks(std::unique_ptr<Bookmarks> bookmarks)
 {
-	if (page_num > this->NowView())
-	{
-		while (m_pageDeque.at(3).page_num != page_num)
-			GetNext();
-	}
-	else if (page_num < m_pageDeque.at(3).page_num)
-	{
-		while (m_pageDeque.at(3).page_num != page_num)
-			GetPrevious();
-	}
-}
-
-void PageBuilder::BookmarkReturn()
-{
-	if (m_page_before_bookmark > this->NowView())
-	{
-		while (m_pageDeque.at(3).page_num != m_page_before_bookmark)
-			GetNext();
-	}
-	else if (m_page_before_bookmark < this->NowView())
-	{
-		while (m_pageDeque.at(3).page_num != m_page_before_bookmark)
-			GetPrevious();
-	}
+	m_bookmarks = std::move(bookmarks);
+	SetupBookmark();
 }
 
 void PageBuilder::SaveImage(float percent, std::wstring path)

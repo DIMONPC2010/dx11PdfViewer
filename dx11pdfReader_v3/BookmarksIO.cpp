@@ -13,6 +13,23 @@ BookmarksIO::BookmarksIO(std::string bookmarks_path) : m_bookmarks_path(bookmark
 	file.close();
 }
 
+BookmarksIO::~BookmarksIO()
+{
+	if (!m_bookmarks.empty())
+	{
+		for (std::list<Bookmarks>::iterator it = m_bookmarks.begin(); it != m_bookmarks.end();)
+		{
+			if (it->GetBookmarksNumber() == 0)
+			{
+					it = m_bookmarks.erase(it);
+			}
+			else
+				++it;
+		}
+		WriteBookmarksToFile();
+	}
+}
+
 bool BookmarksIO::ReadBookmarksFromFile()
 {
 	Bookmarks tmpBookmark;
@@ -205,6 +222,11 @@ bool BookmarksIO::BookmarksExist(std::string filename)
 int BookmarksIO::GetBookmark(int i)
 {
 	return m_now_bookmark->GetBookmark(i);
+}
+
+Bookmarks BookmarksIO::GetBookmarks()
+{
+	return *m_now_bookmark;
 }
 
 int BookmarksIO::NowBookmarksSize()
